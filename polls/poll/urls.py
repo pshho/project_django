@@ -6,8 +6,9 @@ from . import views
 app_name = 'poll'
 
 urlpatterns = [
-    # http://127.0.0.1:8000/poll/
     path("", views.index, name="index"),
+    # http://127.0.0.1:8000/poll/
+    path("poll_list", views.poll_list, name="poll_list"),
     # http://127.0.0.1:8000/poll/test
     path("test/", views.test, name="test"),
     # http://127.0.0.1:8000/poll/

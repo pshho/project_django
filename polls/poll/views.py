@@ -7,9 +7,12 @@ from django.shortcuts import render
 from poll.models import Question
 
 def index(request):
+    return render(request, 'poll/index.html')
+
+def poll_list(request):
     question_list = Question.objects.all()
     # return HttpResponse("<h1>Welcome, Django</h1><br><h2>앞으로 잘 부탁해</h2>")
-    return render(request, 'poll/index.html', {'question_list':question_list})
+    return render(request, 'poll/poll_list.html', {'question_list':question_list})
 
 def test(request):
     cart = "콩나물"  # 모델(데이터) - dictionary 형으로 전달
@@ -66,9 +69,20 @@ def search(request):
             response_body = response.read()
             result = json.loads(response_body.decode('utf-8'))
             items = result.get('items')
+            sub_items = []
+
+            for item in items:
+                sub_item = {
+                    'title':item.get('title'),
+                    'category': item.get('category'),
+                    'address':item.get('address'),
+                    'roadAddress':item.get('roadAddress')
+                }
+
+                sub_items.append(sub_item)
 
             context = {
-                'items': items
+                'items':sub_items
             }
 
         else:

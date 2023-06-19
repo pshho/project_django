@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>상세 보기</title>
+</head>
+<body>
+    <h2>상세 보기</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>제목</th>
+                <th>내용</th>
+                <th>등록일</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ question.subject }}</td>
+                <td>{{ question.content }}</td>
+                <td>{{ question.create_date }}</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

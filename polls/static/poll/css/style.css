@@ -34,3 +34,16 @@ a {
 #main ul li {
     list-style: none;
 }
+
+#container #index {
+    width: 60%;
+    margin: 10px auto;
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+#index img {
+    width: 500px;
+    height: 500px;
+}
