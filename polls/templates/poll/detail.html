@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- static을 추가하기 위해선 항상 명시 -->
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>설문 항목</title>
+    <link rel="stylesheet" href="{% static 'poll/css/style.css' %}">
+</head>
+<body>
+    <div id="container">
+        <section id="main">
+            <h1>설문 항목</h1>
+            <hr>
+            <h3>{{ question.question_text }}</h3>
+            <form action="{% url 'poll:vote' question.id %}" method="post">
+                {% csrf_token %}    <!-- 보안 -->
+                <fieldset>
+                    {% if error %}
+                    <p style="color: red;">{{ error }}</p>
+                    {% endif %}
+                    <legend>{{ question.question_text }}</legend>
+                    {% for choice in question.choice_set.all %}
+                    <ul>
+                        <li>
+                            <label>
+                                <input type="radio" name="choice" value="{{ choice.id }}">{{ choice.choice_text }}
+                            </label>
+                        </li>
+                    </ul>
+                    {% endfor %}
+
+                    <img src="{% static 'poll/images/vote2.jpg' %}" alt="투표">
+                </fieldset>
+                <p><input type="submit" value="투표"></p>
+            </form>
+        </section>
+    </div>
+<!--    <ul>-->
+<!--        {% for choice in question.choice_set.all %}-->
+<!--        <li>{{choice.choice_text}}</li>-->
+<!--        {% endfor %}-->
+<!--    </ul>-->
+</body>
+</html>

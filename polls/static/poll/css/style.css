@@ -1,0 +1,36 @@
+@charset 'utf-8'
+
+#container {
+    width: 80%;
+    margin: 30px auto;
+}
+
+h1 {
+    color: #00f;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* main 스타일 */
+#main {
+    width: 60%;
+    margin: 10px auto;
+    text-align: center;
+}
+
+#main img {
+    width: 500px;
+    height: 500px;
+    margin: 30px 0;
+}
+
+#main ul {
+    width: 30%;
+    margin: 0 auto;
+}
+
+#main ul li {
+    list-style: none;
+}
