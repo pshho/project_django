@@ -39,7 +39,16 @@
         $(document).ready(function() {
             $('form').on('submit', function(e) {
                 e.preventDefault();
-                const value = $('#address').val();
+                var value = $('#address').val();
+                var value2 = value.split('');
+
+                var count = 0;
+
+                for(var i=0; i<value2.length; i++) {
+                    if(!isNaN(value2[i])) {
+                        count++;
+                    }
+                }
 
                 $.ajax({
                     type: "get",
@@ -47,8 +56,13 @@
                     dataType: "json",
                     data: {q:value},
                     success: function(data) {
-                        searchAddressToCoordinate(data.items[0].address, data.items[0].title);
-                        console.log(data.items[0])
+                        if(count >= 3) {
+                            searchAddressToCoordinate(value, '');
+                        }else {
+                            searchAddressToCoordinate(data.items[0].address, data.items[0].title);
+                        }
+
+                        console.log(data.items[2])
                         $('#address').val('');
                     },
                     error: function() {

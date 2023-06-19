@@ -54,9 +54,10 @@ def search(request):
         client_secret = "CM1z5bCrQ6"
         q = request.GET.get('q')
         encText = urllib.parse.quote('{}'.format(q))
+        sort = 'random'
         display = 5
 
-        url = f"https://openapi.naver.com/v1/search/local.json?query={encText}&display={display}"
+        url = f"https://openapi.naver.com/v1/search/local.json?query={encText}&display={display}&sort={sort}"
         req = urllib.request.Request(url)
         req.add_header("X-Naver-Client-Id", client_id)
         req.add_header("X-Naver-Client-Secret", client_secret)
