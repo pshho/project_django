@@ -1,7 +1,7 @@
 import json
 import urllib
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
 from poll.models import Question
@@ -54,11 +54,9 @@ def search(request):
         client_secret = "CM1z5bCrQ6"
         q = request.GET.get('q')
         encText = urllib.parse.quote('{}'.format(q))
-        max_display = 5
-        sort = 'sim'
+        display = 5
 
-        url = f"https://openapi.naver.com/v1/search/local.json?query={encText}&display=" \
-              f"{str(max_display)}&sort={sort}"
+        url = f"https://openapi.naver.com/v1/search/local.json?query={encText}&display={display}"
         req = urllib.request.Request(url)
         req.add_header("X-Naver-Client-Id", client_id)
         req.add_header("X-Naver-Client-Secret", client_secret)
@@ -88,4 +86,7 @@ def search(request):
         else:
             print("Error Code:" + rescode)
 
-        return render(request, 'poll/search.html', context=context)
+        return JsonResponse(context)
+
+def search2(request):
+    return render(request, 'poll/search.html')
