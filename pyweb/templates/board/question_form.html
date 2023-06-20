@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <section id="detail">
+        <h1 class="border-bottom gb-2">질문 등록</h1>
+        <form method="post">
+            {% csrf_token %}
+<!--                {{ form.as_p }}-->
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                {% for field in form %} <!-- 폼의 필드를 순회 -->
+                    {% if field.errors %}   <!-- 에러 출력 -->
+                        {{ field.label }}
+                        {{ field.errors }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="subject">제목</label>
+                <input type="text" name="subject" id="subject" class="form-control border border-5 my-3"
+                       value="{{ form.subject.value | default_if_none:'' }}">
+            </div>
+            <div class="form-group">
+                <label for="content">내용</label>
+                <textarea name="content" id="content" rows="10" class="form-control border border-5 my-3">{{ form.content.value | default_if_none:'' }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary my-3">등록</button>
+        </form>
+    </section>
+</div>
+{% endblock %}
