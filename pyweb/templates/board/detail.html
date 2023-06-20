@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <section id="detail">
+        <h2 class="border-bottom py-2">상세 보기</h2>
+        <div class="card my-4 border border-5" style="width: 35%;">
+            <div class="card-body">
+                <h4 class="card-title py-2">{{ question.subject }}</h4>
+                <h6 class="card-subtitle py-2 mb-2 text-muted">{{ question.create_date }}</h6>
+                <p class="card-text py-2">{{ question.content }}</p>
+            </div>
+        </div>
+
+        <h4>{{ question.answer_set.count }}개의 답변이 있습니다.</h4>
+        <div class="card my-4 border border-5" style="width: 35%;">
+            <div class="card-body">
+                <h4 class="card-title py-2">질문/답변</h4>
+                <h6 class="card-subtitle py-2 mb-2 text-muted"></h6>
+                {% for answer in question.answer_set.all %}
+                <p class="card-text py-2" style="white-space; pre-line">{{ answer.content }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            {% for field in form %} <!-- 폼의 필드를 순회 -->
+                {% if field.errors %}   <!-- 에러 출력 -->
+                    {{ field.label }}
+                    {{ field.errors }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <form action="{% url 'board:answer_create' question.id %}" method="post">
+                {% csrf_token %}
+                <div>
+                    <textarea name="content" rows="10" class="form-control border border-5"></textarea>
+                    <button type="submit" class="btn btn-primary my-3"> 답변등록</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %}

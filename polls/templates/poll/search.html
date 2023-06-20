@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        #map {
+            width: 1000px;
+            height: 700px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .btn_Img {
+            width: 50px;
+            height: 40px;
+            background-image: url(loc.png);
+            background-size: cover;
+        }
+
+        #btn {
+            width: 400px;
+            position: absolute;
+            top: 30px;
+            left: 300px;
+            z-index: 1;
+        }
+
+        #btn #address {
+            width: 70%;
+        }
+
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"
+            integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
+            crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            $('form').on('submit', function(e) {
+                e.preventDefault();
+                var value = $('#address').val();
+
+                $.ajax({
+                    type: "get",
+                    url: "{% url 'poll:search' %}",
+                    dataType: "json",
+                    data: {q:value},
+                    success: function(data) {
+                        if(data.items.length > 0) {
+                            searchAddressToCoordinate(data.items[0].address, data.items[0].title);
+                        }else {
+                            searchAddressToCoordinate(value, value);
+                        }
+
+                        console.log(data.building_names)
+                        $('#address').val('');
+                    },
+                    error: function() {
+                        console.log('확인 불가');
+                    }
+                })
+
+            })
+        })
+    </script>
+</head>
+<body>
+    <div id="map"></div>
+    <form action="{% url 'poll:search' %}" method="get">
+        {% csrf_token %}
+        <div id="btn">
+            <input type="text" id="address">
+            <datalist></datalist>
+            <input type="submit" value="찾기">
+        </div>
+    </form>
+
+    <script type="text/javascript"
+        src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=oq5hyhgd7v"></script>
+    <script type="text/javascript"
+        src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=oq5hyhgd7v&submodules=geocoder"></script>
+
+    <script>
+
+        var map = new naver.maps.Map('map', {
+            center: new naver.maps.LatLng(37.5666805, 126.9784147),
+            zoom: 10,
+            mapTypeControl: true,
+            mapTypeId: naver.maps.MapTypeId.NORMAL,
+            enableHighAccuracy: true
+        });
+
+        var locationBtnHtml = '<a href="#"><div class="btn_Img"></div></a>';
+
+        var infoWindow1 = new naver.maps.InfoWindow({
+            anchorSkew: true
+        });
+
+        var infowindow2 = new naver.maps.InfoWindow();
+
+        map.setCursor('pointer');
+
+        function searchAddressToCoordinate(address, title) {
+            naver.maps.Service.geocode({
+                query: address
+            }, function (status, response) {
+                if (status === naver.maps.Service.Status.ERROR) {
+                    return alert('Something Wrong!');
+                }
+
+                if (response.v2.meta.totalCount === 0) {
+                    return alert('totalCount' + response.v2.meta.totalCount);
+                }
+
+                var htmlAddresses = [],
+                    item = response.v2.addresses[0],
+                    point = new naver.maps.Point(item.x, item.y);
+
+                infoWindow1.setContent([
+                    '<div style="padding:10px;min-width:100px;line-height:50%;">',
+                    '<h4 style="margin-top:5px;">검색 주소 : ' + title + '</h4><br />',
+                    htmlAddresses.join('<br />'),
+                    '</div>'
+                ].join('\n'));
+
+                map.setCenter(point);
+                infoWindow1.open(map, point);
+            });
+        }
+
+        function initGeocoder() {
+            searchAddressToCoordinate('노량진동 67-9', '노량진 할리스');
+
+        }
+
+        function makeAddress(item) {
+            if (!item) {
+                return;
+            }
+
+            var name = item.name,
+                region = item.region,
+                land = item.land,
+                isRoadAddress = name === 'roadaddr';
+
+            var sido = '', sigugun = '', dongmyun = '', ri = '', rest = '';
+
+            if (hasArea(region.area1)) {
+                sido = region.area1.name;
+            }
+
+            if (hasArea(region.area2)) {
+                sigugun = region.area2.name;
+            }
+
+            if (hasArea(region.area3)) {
+                dongmyun = region.area3.name;
+            }
+
+            if (hasArea(region.area4)) {
+                ri = region.area4.name;
+            }
+
+            if (land) {
+                if (hasData(land.number1)) {
+                    if (hasData(land.type) && land.type === '2') {
+                        rest += '산';
+                    }
+
+                    rest += land.number1;
+
+                    if (hasData(land.number2)) {
+                        rest += ('-' + land.number2);
+                    }
+                }
+
+                if (isRoadAddress === true) {
+                    if (checkLastString(dongmyun, '면')) {
+                        ri = land.name;
+                    } else {
+                        dongmyun = land.name;
+                        ri = '';
+                    }
+
+                    if (hasAddition(land.addition0)) {
+                        rest += ' ' + land.addition0.value;
+                    }
+                }
+            }
+
+            return [sido, sigugun, dongmyun, ri, rest].join(' ');
+        }
+
+        function hasArea(area) {
+            return !!(area && area.name && area.name !== '');
+        }
+
+        function hasData(data) {
+            return !!(data && data !== '');
+        }
+
+        function checkLastString(word, lastString) {
+            return new RegExp(lastString + '$').test(word);
+        }
+
+        function hasAddition(addition) {
+            return !!(addition && addition.value);
+        }
+
+        naver.maps.onJSContentLoaded = initGeocoder;
+
+
+        naver.maps.Event.once(map, 'init', function () {
+            var customControl = new naver.maps.CustomControl(locationBtnHtml, {
+                position: naver.maps.Position.RIGHT_CENTER
+            });
+
+            customControl.setMap(map);
+
+            naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
+
+                function onSuccessGeolocation(position) {
+                    var location = new naver.maps.LatLng(position.coords.latitude,
+                        position.coords.longitude);
+
+                    map.setCenter(location); // 얻은 좌표를 지도의 중심으로 설정합니다.
+                    map.setZoom(10); // 지도의 줌 레벨을 변경합니다.
+
+                    infowindow2.setContent('<div style="padding:20px;">' + location + '</div>');
+
+                    infowindow2.open(map, location);
+                }
+
+                function onErrorGeolocation() {
+                    var center = map.getCenter();
+
+                    infowindow2.setContent('<div style="padding:20px;">' +
+                        '<h5 style="margin-bottom:5px;color:#f00;">Geolocation failed!</h5>' + "latitude: " + center.lat() + "<br />longitude: " + center.lng() + '</div>');
+
+                    infowindow2.open(map, center);
+                }
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(onSuccessGeolocation, onErrorGeolocation);
+                } else {
+                    var center = map.getCenter();
+                    infowindow2.setContent('<div style="padding:20px;"><h5 style="margin-bottom:5px;color:#f00;">Geolocation not supported</h5></div>');
+                    infowindow2.open(map, center);
+                }
+
+            });
+        });
+
+    </script>
+</body>
+</html>
