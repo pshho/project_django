@@ -94,3 +94,71 @@ def search(request):
 
 def search2(request):
     return render(request, 'poll/search.html')
+
+def mapmarket(request):
+    if request.method == 'GET':
+
+        client_id = "Gr3DZKpSitjNw83linRK"
+        client_secret = "CM1z5bCrQ6"
+        q = request.GET.get('q')
+        encText = urllib.parse.quote('{}'.format(q))
+        sort = 'random'
+        display = 5
+
+        url = f"https://openapi.naver.com/v1/search/local.json?query={encText}&display={display}&sort={sort}"
+        req = urllib.request.Request(url)
+        req.add_header("X-Naver-Client-Id", client_id)
+        req.add_header("X-Naver-Client-Secret", client_secret)
+        response = urllib.request.urlopen(req)
+        rescode = response.getcode()
+
+        if (rescode == 200):
+            response_body = response.read()
+            result = json.loads(response_body.decode('utf-8'))
+            items = result.get('items')
+            sub_items = []
+
+            for item in items:
+                sub_item = {
+                    'title':item.get('title'),
+                    'category': item.get('category'),
+                    'address':item.get('address'),
+                    'roadAddress':item.get('roadAddress')
+                }
+
+                sub_items.append(sub_item)
+
+            context = {
+                'items':sub_items
+            }
+
+        else:
+            print("Error Code:" + rescode)
+
+        return JsonResponse(context)
+
+
+
+
+    with open('./polls/static/poll/resources/서울시부동산정보.csv', 'r') as r:
+        data_list = csv.reader(r)
+        ssg_list = []
+        count = 0
+        for data in data_list:
+            if data[7] != '' or data[8] != '' or data[15] != '':
+                if data[8] != '0000':
+                    result = data[2] + ' ' + data[4] + ' ' + data[7] + ' ' + data[8]
+                    ssg_list.append(result)
+                    count += 1
+                elif data[8] == '0000':
+                    result = data[2] + ' ' + data[4] + ' ' + data[7]
+                    ssg_list.append(result)
+                    count += 1
+
+    print(ssg_list)
+    print(count)
+
+    context = {
+        'ssg_list':ssg_list
+    }
+    return JsonResponse(context)

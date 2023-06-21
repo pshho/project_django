@@ -1,4 +1,5 @@
 import csv
+import requests
 import urllib.request
 import json
 
@@ -33,10 +34,73 @@ print(count)
 #     print(sgg_name)
 
 '''
+
+'''
 with open('./polls/static/poll/resources/서울시부동산정보.csv', 'r') as r:
     data_list = csv.reader(r)
     ssg_list = []
+    # count = 0
     for data in data_list:
-        ssg_list.append(data[0])
+        if data[7] != '' or data[8] != '' or data[15] != '':
+            if data[8] != '0000':
+                result = data[2] + ' ' + data[4] + ' ' + data[7] + ' ' + data[8]
+                ssg_list.append(result)
+                # count += 1
+            elif data[8] == '0000':
+                result = data[2] + ' ' + data[4] + ' ' + data[7]
+                ssg_list.append(result)
+                # count += 1
+'''
 
-print(ssg_list)
+with open('./polls/static/poll/resources/강남구.csv', 'r') as r:
+    data_list = csv.reader(r)
+    ssg_list = []
+    # count = 0
+
+    for item in data_list:
+        if len(item) >= 4:
+            result = item[0] + ' ' + item[1] + ' ' + item[2] + ' ' + item[3]
+            ssg_list.append(result)
+            # count += 1
+        else:
+            result = item[0] + ' ' + item[1] + ' ' + item[2]
+            ssg_list.append(result)
+            # count += 1
+
+url_front = "http://api.vworld.kr/req/address?"
+url_params = "service=address&request=getcoord&version=2.0&crs=epsg:4326&refine=true&simple=false&format=json&type=road"
+url_address = "&address="
+url_key = "&key="
+auth_key = "7F333705-8E22-391D-A774-644985B13EDD"
+
+count = 0
+for addr in ssg_list:
+    address = addr
+
+    # url 완성
+    url = url_front + url_params + url_address + address + url_key + auth_key
+
+    result = requests.get(url)
+    json_data = result.json()
+
+    if json_data['response']['status'] == 'OK':
+        x = json_data['response']['result']['point']['x']
+        y = json_data['response']['result']['point']['y']
+        print("\n경도: ", x, "\n위도: ", y)
+        count += 1
+
+print(count)
+
+
+
+
+# print(url)
+
+
+
+# print(json_data)
+
+
+
+# print(ssg_list)
+# print(count)
