@@ -8,6 +8,18 @@
                 <h4 class="card-title py-2">{{ question.subject }}</h4>
                 <h6 class="card-subtitle py-2 mb-2 text-muted">{{ question.create_date }}</h6>
                 <p class="card-text py-2">{{ question.content }}</p>
+                <div class="d-flex">
+                    <div class="badge bg-dark">
+                        <p class="card-text py-2">작성자: {{ question.author }}</p>
+                    </div>
+                </div>
+                {% if question.author == request.user %}
+                <div>
+                    <a href="#"
+                       class="delete btn btn-sm btn-online-secondary border border-2 my-3"
+                       data-uri="{% url 'board:question_delete' question.id %}">삭제</a>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -19,25 +31,21 @@
                 {% for answer in question.answer_set.all %}
                 <p class="card-text py-2" style="white-space; pre-line">{{ answer.content }}</p>
                 {% endfor %}
+                <div class="d-flex">
+                    <div class="badge bg-dark">
+                        <p class="card-text py-2">작성자: {{ answer.author }}</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        {% if form.errors %}
-        <div class="alert alert-danger">
-            {% for field in form %} <!-- 폼의 필드를 순회 -->
-                {% if field.errors %}   <!-- 에러 출력 -->
-                    {{ field.label }}
-                    {{ field.errors }}
-                {% endif %}
-            {% endfor %}
-        </div>
-        {% endif %}
-
+        {% include 'form_errors.html' %}
         <div class="form-group">
             <form action="{% url 'board:answer_create' question.id %}" method="post">
                 {% csrf_token %}
                 <div>
-                    <textarea name="content" rows="10" class="form-control border border-5"></textarea>
+                    <textarea name="content" rows="10" class="form-control border border-5"
+                    {% if not user.is_authenticated %}disabled{% endif %}></textarea>
                     <button type="submit" class="btn btn-primary my-3"> 답변등록</button>
                 </div>
             </form>

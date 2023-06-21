@@ -1,0 +1,18 @@
+
+{% block content %}
+
+{% if form.errors %}
+<div class="alert alert-danger">
+    {% for field in form %} <!-- 폼의 필드를 순회 -->
+        {% if field.errors %}   <!-- 에러 출력 -->
+            {{ field.label }}
+            {{ field.errors }}
+        {% endif %}
+    {% endfor %}
+    {% if form.non_field_errors %}
+        {{ form.non_field_errors }}
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,5 +1,6 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from board.forms import QuestionForm, AnswerForm
@@ -9,21 +10,25 @@ def index(request):
     return render(request, 'board/index.html')
 
 def question_list(request):
-    question_list = Question.objects.all()
+    question_list = Question.objects.order_by('-create_date')
     context = {'question_list':question_list}
     return render(request, 'board/question_list.html', context)
 
 def detail(request, question_id):
-    question = Question.objects.get(id=question_id)
+    # question = Question.objects.get(id=question_id)
+    # 모델에서 데이터가 있으면 가져오고 없으면 404페이지 오류 처리
+    question = get_object_or_404(Question, pk=question_id)
     context = {'question':question}
     return render(request, 'board/detail.html', context)
 
+@login_required(login_url='common:login')
 def question_create(request):
     if request.method == "POST":
         form = QuestionForm(request.POST)
 
         if form.is_valid(): # 폼이 유효성 검사를 통과했다면
             question = form.save(commit=False)
+            question.author = request.user
             question.create_date = timezone.now()
             form.save()
 
@@ -34,14 +39,17 @@ def question_create(request):
     context = {'form':form}
     return render(request, 'board/question_form.html', context)
 
+@login_required(login_url='common:login')
 def answer_create(request, question_id):
-    question = Question.objects.get(id=question_id)
+    # question = Question.objects.get(id=question_id)
+    question = get_object_or_404(Question, pk=question_id)
 
     if request.method == 'POST':
         form = AnswerForm(request.POST)
 
         if form.is_valid():
             answer = form.save(commit=False)    # content만 저장
+            question.author = request.user
             answer.create_date = timezone.now()
             answer.question = question
             form.save()
@@ -53,6 +61,12 @@ def answer_create(request, question_id):
 
     context = {'question':question, 'form':form}
 
-
-
     return render(request, 'board/detail.html', context)
+
+@login_required(login_url='common:login')
+def question_delete(request, question_id):
+    # question = Question.objects.get(id=question_id)
+    question = get_object_or_404(Question, pk=question_id)
+    question.delete()
+
+    return redirect('board:question_list')
