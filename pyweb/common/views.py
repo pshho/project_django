@@ -1,4 +1,6 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login
+from django.contrib.auth.forms import AuthenticationForm
+
 from django.shortcuts import render, redirect
 
 from common.forms import UserForm
@@ -13,7 +15,7 @@ def signup(request):
 
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
+            user = AuthenticationForm(username=username, password=password)
             login(request, user)    # 자동 로그인
 
             return redirect('/')

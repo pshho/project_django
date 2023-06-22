@@ -4,7 +4,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from board.forms import QuestionForm, AnswerForm
-from board.models import Question
+from board.models import Question, Answer
+
 
 def index(request):
     return render(request, 'board/index.html')
@@ -49,7 +50,7 @@ def answer_create(request, question_id):
 
         if form.is_valid():
             answer = form.save(commit=False)    # content만 저장
-            question.author = request.user
+            answer.author = request.user
             answer.create_date = timezone.now()
             answer.question = question
             form.save()
@@ -70,3 +71,33 @@ def question_delete(request, question_id):
     question.delete()
 
     return redirect('board:question_list')
+
+@login_required(login_url='common:login')
+def answer_delete(request, answer_id):
+    # question = Question.objects.get(id=question_id)
+    answer = get_object_or_404(Answer, pk=answer_id)
+    answer.delete()
+
+    return redirect('board:detail', question_id=answer.question.id)
+
+@login_required(login_url='common:login')
+def question_modify(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+
+    if request.method == "POST":
+        form = QuestionForm(request.POST, instance=question)
+
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.modify_date = timezone.now()
+            question.author = request.user
+            question.save()
+
+            return redirect('board:detail', question_id=question_id)
+
+    else:
+        form = QuestionForm(instance=question)
+
+    context = {'form':form}
+
+    return render(request, 'board/question_form.html', context)

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <h1>블로그 상세보기</h1>
+    <h3>{{ post.title }}</h3>
+    <h5 style="white-space: pre-line; line-height: 2em;">{{ post.content }}</h5>
+    <p>(작성일: {{ post.pub_date }})</p>
+    {% if post.photo %}
+    <img src="{{ post.photo.url }}">
+    {% endif %}
+</div>
+{% endblock %}
