@@ -43,7 +43,7 @@
 
                 $.ajax({
                     type: "get",
-                    url: "{% url 'poll:search' %}",
+                    url: "/poll/search/",
                     dataType: "json",
                     data: {q:value},
                     success: function(data) {
