@@ -98,6 +98,45 @@
     <script src="https://code.jquery.com/jquery-3.7.0.js"
             integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
             crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            function formatPhoneNumber(phoneNumber) {
+                var cleaned = phoneNumber.replace(/\D/g, '');
+                var formatPhNumber = '';
+
+                if (phoneNumber.length > 10) {
+                    var formatPhNumber = cleaned.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+                } else if (phoneNumber.length == 10) {
+                    var formatPhNumber = cleaned.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+                } else if (phoneNumber.length == 9) {
+                    var formatPhNumber = cleaned.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3');
+                } else if (phoneNumber.length == 8) {
+                    var formatPhNumber = cleaned.replace(/(\d{4})(\d{4})/, '$1-$2');
+                }
+
+                return formatPhNumber;
+
+            }
+
+            var phoneNumElement = $('#ph_number');
+
+            var phoneNumber = phoneNumElement.text();
+
+            var formatPhNumber = formatPhoneNumber(phoneNumber);
+
+            phoneNumElement.text(formatPhNumber);
+
+            var phoneNum = $('#ph_num');
+
+            var phone = phoneNum.text();
+
+            var formatPh = formatPhoneNumber(phone);
+
+            phoneNum.text(formatPh);
+
+        });
+
+    </script>
 
 </head>
 <body>
@@ -127,7 +166,7 @@
                 </tr>
                 <tr>
                     <td>문의처</td>
-                    <td>{{ data.MDHS_TELNO }}</td>
+                    <td id="ph_number">{{ data.MDHS_TELNO }}</td>
                 </tr>
             </tbody>
         </table>
@@ -146,6 +185,7 @@
                     <td>기타지역</td>
                     <td>접수장소</td>
                 </tr>
+                {% if data.SPSPLY_RCEPT_BGNDE is not None %}
                 <tr>
                     <td>특별공급</td>
                     <td>{{ data.SPSPLY_RCEPT_BGNDE }}</td>
@@ -164,13 +204,33 @@
                     <td>{{ data.SPSPLY_RCEPT_BGNDE }}</td>
                     <td>인터넷</td>
                 </tr>
+                {% else %}
+                <tr>
+                    <td>특별공급</td>
+                    <td></td>
+                    <td></td>
+                    <td>인터넷</td>
+                </tr>
+                <tr>
+                    <td>1순위</td>
+                    <td></td>
+                    <td></td>
+                    <td>인터넷</td>
+                </tr>
+                <tr>
+                    <td>2순위</td>
+                    <td></td>
+                    <td></td>
+                    <td>인터넷</td>
+                </tr>
+                {% endif %}
                 <tr>
                     <td class="calendar-table-td">당첨자 발표일</td>
-                    <td colspan="4">{{ data.HOUSE_NM }}</td>
+                    <td colspan="4">{{ data.PRZWNER_PRESNATN_DE }}</td>
                 </tr>
                 <tr>
                     <td class="calendar-table-td">계약일</td>
-                    <td colspan="4">{{ data.HOUSE_NM }}</td>
+                    <td colspan="4">{{ data.CNTRCT_CNCLS_ENDDE }}</td>
                 </tr>
             </tbody>
         </table>
@@ -183,32 +243,36 @@
                     <td rowspan="2">주택구분</td>
                     <td rowspan="2">주택형</td>
                     <td rowspan="2">주택공급면적<br>(주거전용+주거공용)</td>
-                    <td colspan="3">공급세대수</td>
+                    <td colspan="2">공급세대수</td>
                     <td rowspan="2">주택관리번호(모델번호)</td>
                 </tr>
                 <tr>
                     <td>일반</td>
                     <td>특별</td>
-                    <td>계</td>
                 </tr>
             </thead>
             <tbody class="calendar-table-tb3">
                 <tr>
-                    <td>민영</td>
-                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
-                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
-                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
-                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
-                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
-                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
+                    <td class="calendar-table-td2" rowspan="{{ rowspan }}"
+                    >{{ data.HOUSE_DTL_SECD_NM }}{{ data.HOUSE_SECD_NM }}</td>
                 </tr>
+                {% for data1 in data_list2 %}
                 <tr>
-                    <td colspan="3">계</td>
-                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
-                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
-                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
+                    <td class="calendar-table-td2">{{ data1.HOUSE_TY }}</td>
+                    {% if data1.SUPLY_AR is not None %}
+                    <td class="calendar-table-td2">{{ data1.SUPLY_AR }}</td>
+                    {% else %}
                     <td></td>
+                    {% endif %}
+                    <td class="calendar-table-td2">{{ data1.SUPLY_HSHLDCO }}</td>
+                    {% if data1.SPSPLY_HSHLDCO is not None %}
+                    <td class="calendar-table-td2">{{ data1.SPSPLY_HSHLDCO }}</td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    <td class="calendar-table-td2">{{ data.HOUSE_MANAGE_NO }}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
         <div class="calendar-sub">
@@ -223,28 +287,28 @@
                     <td colspan="8">공급세대수</td>
                 </tr>
                 <tr>
-                    <td rowspan="2">{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
+                    <td rowspan="2">다자녀가구</td>
+                    <td>신혼부부</td>
+                    <td>생애최초</td>
+                    <td>노부모 부양</td>
+                    <td>기관추천</td>
+                    <td>이전기관</td>
+                    <td>기타</td>
                 </tr>
             </thead>
             <tbody class="calendar-table-tb4">
+                {% for data1 in data_list2 %}
                 <tr>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data1.HOUSE_TY }}</td>
+                    <td>{{ data1.MNYCH_HSHLDCO }}</td>
+                    <td>{{ data1.NWWDS_HSHLDCO }}</td>
+                    <td>{{ data1.LFE_FRST_HSHLDCO }}</td>
+                    <td>{{ data1.OLD_PARNTS_SUPORT_HSHLDCO }}</td>
+                    <td>{{ data1.INSTT_RECOMEND_HSHLDCO }}</td>
+                    <td>{{ data1.TRANSR_INSTT_ENFSN_HSHLDCO }}</td>
+                    <td>{{ data1.ETC_HSHLDCO }}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
         <p>
@@ -268,11 +332,20 @@
                 </tr>
             </thead>
             <tbody class="calendar-table-tb5">
+                {% for data1 in data_list2 %}
+                    {% if forloop.first %}
                 <tr>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data1.HOUSE_TY }}</td>
+                    <td>{{ data1.LTTOT_TOP_AMOUNT }}</td>
+                    <td rowspan="{{ rowspan }}">청약통장으로 청약(청약금 없음)</td>
                 </tr>
+                    {% else %}
+                <tr>
+                    <td>{{ data1.HOUSE_TY }}</td>
+                    <td>{{ data1.LTTOT_TOP_AMOUNT }}</td>
+                </tr>
+                    {% endif %}
+                {% endfor %}
             </tbody>
         </table>
         <p>* 층별(동호수별) 세부 공급금액은 사업주체의 입주자모집 공고문을 참고하시기 바랍니다.</p>
@@ -288,9 +361,9 @@
             </thead>
             <tbody class="calendar-table-tb6">
                 <tr>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
-                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.BSNS_MBY_NM }}</td>
+                    <td>{{ data.CNSTRCT_ENTRPS_NM }}</td>
+                    <td id="ph_num">{{ data.MDHS_TELNO }}</td>
                 </tr>
             </tbody>
         </table>
