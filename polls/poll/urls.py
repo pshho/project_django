@@ -17,4 +17,5 @@ urlpatterns = [
     path("search/", views.search, name="search"),
     path("search2/", views.search2, name="search2"),
     path('calendar/', views.calendar, name='calendar'),
+    path('calendar/calendar_iframe/<str:title>/', views.calendar_iframe, name='calendar_iframe'),
 ]

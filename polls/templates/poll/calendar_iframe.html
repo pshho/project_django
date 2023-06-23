@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
     <style>
+        body {
+            background: white;
+        }
+
         .calendar_detail {
-            width: 50%;
-            margin: 0 auto;
             position: relative;
         }
 
@@ -96,19 +98,10 @@
     <script src="https://code.jquery.com/jquery-3.7.0.js"
             integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
             crossorigin="anonymous"></script>
-    <script>
-        $(document).ready(function() {
-            $('#calendar-close-btn1').click(function() {
-                window.close();
-            });
 
-            $('#calendar-close-btn2').click(function() {
-                window.close();
-            });
-        });
-    </script>
 </head>
 <body>
+    {% for data in data_list %}
     <section class="calendar_detail">
         <div class="calendar-close-btn1" id="calendar-close-btn1">X</div>
         <h3>입주자모집공고 정보</h3>
@@ -116,25 +109,25 @@
         <table class="calendar-table">
             <thead class="calendar-table-th1">
                 <tr>
-                    <td colspan="2">1</td>
+                    <td colspan="2">{{ data.HOUSE_NM }}</td>
                 </tr>
             </thead>
             <tbody class="calendar-table-tb1">
                 <tr>
                     <td>공급위치</td>
-                    <td>1</td>
+                    <td>({{ data.HSSPLY_ZIP }}) {{ data.HSSPLY_ADRES }}{{ data.HSSPLY_HSHLDCO }}</td>
                 </tr>
                 <tr>
                     <td>공급규모</td>
-                    <td>1</td>
+                    <td>{{ data.TOT_SUPLY_HSHLDCO }}</td>
                 </tr>
                 <tr>
-                    <td>입주자모집공고 관련 문의</td>
-                    <td>1</td>
+                    <td>입주자모집공고 문의</td>
+                    <td>사업주체 또는 분양사무실로 문의</td>
                 </tr>
                 <tr>
                     <td>문의처</td>
-                    <td>1</td>
+                    <td>{{ data.MDHS_TELNO }}</td>
                 </tr>
             </tbody>
         </table>
@@ -144,22 +137,40 @@
             <tbody class="calendar-table-tb2">
                 <tr>
                     <td class="calendar-table-td">모집공고일</td>
-                    <td colspan="4">1</td>
+                    <td colspan="4">{{ data.RCRIT_PBLANC_DE }}</td>
                 </tr>
                 <tr>
-                    <td class="calendar-table-td">청약접수</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
+                    <td class="calendar-table-td" rowspan="4">청약접수</td>
+                    <td>구분</td>
+                    <td>해당지역</td>
+                    <td>기타지역</td>
+                    <td>접수장소</td>
+                </tr>
+                <tr>
+                    <td>특별공급</td>
+                    <td>{{ data.SPSPLY_RCEPT_BGNDE }}</td>
+                    <td>{{ data.SPSPLY_RCEPT_BGNDE }}</td>
+                    <td>인터넷</td>
+                </tr>
+                <tr>
+                    <td>1순위</td>
+                    <td>{{ data.SPSPLY_RCEPT_BGNDE }}</td>
+                    <td>{{ data.SPSPLY_RCEPT_BGNDE }}</td>
+                    <td>인터넷</td>
+                </tr>
+                <tr>
+                    <td>2순위</td>
+                    <td>{{ data.SPSPLY_RCEPT_BGNDE }}</td>
+                    <td>{{ data.SPSPLY_RCEPT_BGNDE }}</td>
+                    <td>인터넷</td>
                 </tr>
                 <tr>
                     <td class="calendar-table-td">당첨자 발표일</td>
-                    <td colspan="4">1</td>
+                    <td colspan="4">{{ data.HOUSE_NM }}</td>
                 </tr>
                 <tr>
                     <td class="calendar-table-td">계약일</td>
-                    <td colspan="4">1</td>
+                    <td colspan="4">{{ data.HOUSE_NM }}</td>
                 </tr>
             </tbody>
         </table>
@@ -184,18 +195,18 @@
             <tbody class="calendar-table-tb3">
                 <tr>
                     <td>민영</td>
-                    <td class="calendar-table-td2">1</td>
-                    <td class="calendar-table-td2">1</td>
-                    <td class="calendar-table-td2">1</td>
-                    <td class="calendar-table-td2">1</td>
-                    <td class="calendar-table-td2">1</td>
-                    <td class="calendar-table-td2">1</td>
+                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
+                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
+                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
+                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
+                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
+                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
                 </tr>
                 <tr>
                     <td colspan="3">계</td>
-                    <td class="calendar-table-td2">1</td>
-                    <td class="calendar-table-td2">1</td>
-                    <td class="calendar-table-td2">1</td>
+                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
+                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
+                    <td class="calendar-table-td2">{{ data.HOUSE_NM }}</td>
                     <td></td>
                 </tr>
             </tbody>
@@ -212,27 +223,27 @@
                     <td colspan="8">공급세대수</td>
                 </tr>
                 <tr>
-                    <td rowspan="2">1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
+                    <td rowspan="2">{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
                 </tr>
             </thead>
             <tbody class="calendar-table-tb4">
                 <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
                 </tr>
             </tbody>
         </table>
@@ -258,9 +269,9 @@
             </thead>
             <tbody class="calendar-table-tb5">
                 <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
                 </tr>
             </tbody>
         </table>
@@ -277,9 +288,9 @@
             </thead>
             <tbody class="calendar-table-tb6">
                 <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
+                    <td>{{ data.HOUSE_NM }}</td>
                 </tr>
             </tbody>
         </table>
@@ -288,5 +299,6 @@
             <button type="button" class="calendar-close-btn2" id="calendar-close-btn2">닫기</button>
         </div>
     </section>
+    {% endfor %}
 </body>
 </html>

@@ -1,11 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container my-3">
-    <h3>글쓰기</h3>
-    <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">저장</button>
-    </form>
-</div>
+<section>
+    <div class="container my-3">
+        <h3>글쓰기</h3>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">저장</button>
+        </form>
+    </div>
+</section>
+<aside>
+    <h4>분류(Category)</h4>
+    <div>
+        <ul>
+            {% for category in categories %}
+            <li>
+                <a href="{{ category.get_absolute_url }}">{{ category.name }}({{ category.post_set.count }})</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</aside>
 {% endblock %}

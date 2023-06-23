@@ -229,4 +229,89 @@ def calendar(request):
                 print(data)
         '''
 
-        return JsonResponse(data_list, safe=False)
+        # context = {'data_list':data_list}
+
+        results = []
+        # count = 0
+
+        for data in data_list:
+            if 'RCEPT_BGNDE' in data:
+                result = {
+                    'title': data['HOUSE_NM'],
+                    'start': data['RCEPT_BGNDE']
+                }
+                # count += 1
+                results.append(result)
+            elif 'SUBSCRPT_RCEPT_BGNDE' in data:
+                result = {
+                    'title': data['HOUSE_NM'],
+                    'start': data['SUBSCRPT_RCEPT_BGNDE']
+                }
+                # count += 1
+                results.append(result)
+
+        context = {
+            'context':results
+        }
+        return render(request, 'poll/calendar.html', context)
+
+# 달력 iframe 출력
+def calendar_iframe(request, title):
+    if request.method == 'GET':
+
+        url1 = 'https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail?'
+        page = 'page=1&'
+        perPage = 'perPage=100000&'
+        serviceKey = 'serviceKey=ibEJT6J0bl9WzpzbwJVPg9on2aBStbXKZnT8a7sLOTuEi5LMGvjsPAufQYld%2Br%2FvL6B4VhxXZ5EnI7j1GO%2B8uQ%3D%3D'
+
+        url2 = 'https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getUrbtyOfctlLttotPblancDetail?'
+        url3 = 'https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getRemndrLttotPblancDetail?'
+
+        reqUrl1 = url1 + page + perPage + serviceKey
+        reqUrl2 = url2 + page + perPage + serviceKey
+        reqUrl3 = url3 + page + perPage + serviceKey
+        result1 = requests.get(reqUrl1)
+        json_data1 = result1.json()
+
+        # count = 0
+
+        data_list = []
+        # APT 분양정보 청약 접수 시작일
+        for data in json_data1['data']:
+            if title == data['HOUSE_NM']:
+                if '2023-06' in data['RCEPT_BGNDE']:
+                    data_list.append(data)
+                elif '2023-07' in data['RCEPT_BGNDE']:
+                    data_list.append(data)
+                    # count += 1
+                    # print(data)
+
+        # 오피스텔/도시형/민간임대 분양정보 청약 접수 시작일
+        result2 = requests.get(reqUrl2)
+        json_data2 = result2.json()
+
+        for data in json_data2['data']:
+            if title == data['HOUSE_NM']:
+                if '2023-06' in data['SUBSCRPT_RCEPT_BGNDE']:
+                    data_list.append(data)
+                elif '2023-07' in data['SUBSCRPT_RCEPT_BGNDE']:
+                    data_list.append(data)
+                    # count += 1
+                    # print(data)
+
+        # APT 무순위/잔여세대 일반 공급 접수 시작일
+        result3 = requests.get(reqUrl3)
+        json_data3 = result3.json()
+
+        for data in json_data3['data']:
+            if title == data['HOUSE_NM']:
+                if '2023-06' in data['SUBSCRPT_RCEPT_BGNDE']:
+                    data_list.append(data)
+                elif '2023-07' in data['SUBSCRPT_RCEPT_BGNDE']:
+                    data_list.append(data)
+
+        context = {
+            'data_list':data_list
+        }
+
+        return render(request, 'poll/calendar_iframe.html', context)

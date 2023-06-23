@@ -19,17 +19,27 @@ count = 0
 data_list = []
 # APT 분양정보 청약 접수 시작일
 for data in json_data1['data']:
-    if '2023-06' in data['RCEPT_BGNDE']:
-        data_list.append(data)
-        count += 1
-        # print(data)
+    if '보은 대신 센텀캐슬 아파트' == data['HOUSE_NM']:
+        if '2023-06' in data['RCEPT_BGNDE']:
+            data_list.append(data)
+            count += 1
+        elif '2023-07' in data['RCEPT_BGNDE']:
+            data_list.append(data)
+            count += 1
+            # print(data)
 
+print(data_list)
+
+'''
 # 오피스텔/도시형/민간임대 분양정보 청약 접수 시작일
 result2 = requests.get(reqUrl2)
 json_data2 = result2.json()
 
 for data in json_data2['data']:
     if '2023-06' in data['SUBSCRPT_RCEPT_BGNDE']:
+        data_list.append(data)
+        count += 1
+    elif '2023-07' in data['SUBSCRPT_RCEPT_BGNDE']:
         data_list.append(data)
         count += 1
         # print(data)
@@ -42,11 +52,38 @@ for data in json_data3['data']:
     if '2023-06' in data['SUBSCRPT_RCEPT_BGNDE']:
         data_list.append(data)
         count += 1
+    elif '2023-07' in data['SUBSCRPT_RCEPT_BGNDE']:
+        data_list.append(data)
+        count += 1
         # print(data)
 
 print(data_list)
 print(count)
 
+
 for data in data_list:
     if '평택현덕지역주택조합' in data['BSNS_MBY_NM']:
         print(data)
+
+results = []
+# count = 0
+
+for data in data_list:
+    if 'RCEPT_BGNDE' in data:
+        result = {
+            'title': data['HOUSE_NM'],
+            'start': data['RCEPT_BGNDE']
+        }
+        # count += 1
+        results.append(result)
+    elif 'SUBSCRPT_RCEPT_BGNDE' in data:
+        result = {
+            'title': data['HOUSE_NM'],
+            'start': data['SUBSCRPT_RCEPT_BGNDE']
+        }
+        # count += 1
+        results.append(result)
+
+print(results)
+print(count)
+'''

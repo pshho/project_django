@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
 from blog.forms import PostForm
-from blog.models import Post
+from blog.models import Post, Category
 from django.utils import timezone
 
 
@@ -10,12 +10,14 @@ def index(request):
 
 def post_list(request):
     post_list = Post.objects.all()
-    context = {'post_list':post_list}
+    categories = Category.objects.all()
+    context = {'post_list':post_list, 'categories':categories}
     return render(request, 'blog/post_list.html', context)
 
 def detail(request, post_id):
     post = Post.objects.get(id=post_id)
-    context = {'post':post}
+    categories = Category.objects.all()
+    context = {'post':post, 'categories':categories}
     return render(request, 'blog/detail.html', context)
 
 def post_create(request):
@@ -33,3 +35,18 @@ def post_create(request):
 
     context = {'form':form}
     return render(request, 'blog/post_form.html', context)
+
+# 카테고리 페이지 처리
+def category_page(request, slug):
+    current_category = Category.objects.get(slug=slug)
+    post_list = Post.objects.filter(category=current_category)
+    post_list = post_list.order_by('-pub_date')
+    categories = Category.objects.all()
+    context = {
+        'current_category':current_category,
+        'post_list':post_list,
+        'categories':categories
+
+    }
+
+    return render(request, 'blog/post_list.html', context)

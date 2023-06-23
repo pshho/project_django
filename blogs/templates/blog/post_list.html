@@ -4,6 +4,9 @@
     <h1>블로그 홈</h1>
     {% if post_list %}
         {% for post in post_list %}
+            {% if post.category %}
+                <h6 class="text-end">[{{ post.category }}]</h6>
+            {% endif %}
             <h3>
                 <a href="{% url 'blog:detail' post.id %}">
                     {{ post.title }}
@@ -15,5 +18,23 @@
     {% else %}
         <p>포스트 X</p>
     {% endif %}
+    <aside>
+        <h4>분류(Category)</h4>
+        <div>
+            <ul>
+                {% for category in categories %}
+                    {% if current_category.slug == category.slug %}
+                    <li class="background: red">
+                        <a href="{{ category.get_absolute_url }}">{{ category.name }}({{ category.post_set.count }})</a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a href="{{ category.get_absolute_url }}">{{ category.name}}({{ category.post_set.count }})</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </aside>
 </div>
 {% endblock %}

@@ -1,40 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="{% static 'fullcalendar-6.1.8/fullcalendar-6.1.8/dist/index.global.js' %}"></script>
+    <style>
+        .calendar-box {
+            width: 60%;
+            height: 60%;
+            margin: 20px auto;
+        }
+
+        .calendar-box > h3 {
+            font-size: 2rem;
+        }
+    </style>
+    <script src="{% static 'poll/js/fullcalendar-6.1.8/fullcalendar-6.1.8/dist/index.global.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.js"
             integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
             crossorigin="anonymous"></script>
+</head>
+<body>
+    <section class="calendar-box">
+        <h3>청약 캘린더</h3>
+        <div id='calendar' class="calendar"></div>
+    </section>
+
     <script>
-
-        // JSON 데이터를 받아서 이벤트 객체로 변환하는 함수
-        function createEventsFromJSON(data) {
-            var events = [];
-
-            // JSON 데이터를 순회하며 이벤트 객체 생성
-            for (var i = 0; i < data.length; i++) {
-                var eventData = data[i];
-
-                if(eventData['RCEPT_BGNDE']) {
-                    var event = {
-                        title: eventData['HOUSE_NM'],
-                        start: eventData['RCEPT_BGNDE']
-                    };
-                }else if(eventData['SUBSCRPT_RCEPT_BGNDE']) {
-                    var event = {
-                        title: eventData['HOUSE_NM'],
-                        start: eventData['SUBSCRPT_RCEPT_BGNDE']
-                    }
-                }
-
-                events.push(event);
-            }
-
-            return events;
-        }
 
         document.addEventListener('DOMContentLoaded', function() {
                 var calendarEl = document.getElementById('calendar');
@@ -54,20 +47,21 @@
 
                     eventClick: function(info) {
                         var title = info.event.title;
+                        var urls = 'calendar_iframe/' + title;
 
                         var links = {   // 해당 날짜 선택 시 해당하는 경로 설정
-                            title:'https://www.dabangapp.com/'
+                            title:urls
                         }
 
-                        var url = links[title]
+                        var url = links['title'];
 
                         if (url) {
                             var $body = $('body');
                             var $iframe = $('<iframe>', {
                                 src: url,
                                 css: {
-                                    width: '80%',
-                                    height: '80%',
+                                    width: '50%',
+                                    height: '90%',
                                     position: 'fixed',
                                     top: '50%',
                                     left: '50%',
@@ -82,47 +76,35 @@
                                 $body.one('click', function() {
                                     $iframe.remove();
                                 });
+
+                                $iframe.contents().find('#calendar-close-btn1').click(function() {
+                                    $iframe.remove();
+                                });
+
+                                $iframe.contents().find('#calendar-close-btn2').click(function() {
+                                    $iframe.remove();
+                                });
+
                             });
                         }
 
                     },
 
-                    events: function(info, successCallback, failureCallback) {
-                        // JSON 데이터를 가져오는 비동기 요청
-                        // 예시: jQuery의 ajax를 사용한 비동기 요청
-                        $.ajax({
-                        type: 'get',
-                        url: '/poll/calendar/', // JSON 데이터 파일 경로
-                        dataType: 'json',
-                        success: function(response) {
-                            // JSON 데이터를 이벤트 객체로 변환
-                            var events = createEventsFromJSON(response);
-
-                            // 이벤트 객체를 달력에 추가
-                            successCallback(events);
-                        },
-                        error: function(xhr, status, error) {
-                            // 에러 처리
-                            console.error(error);
-                            failureCallback(error);
-                        }
-                    });
-                },
+                    events: Object.values({{ context|safe }}).map(item => ({
+                        title: item.title,
+                        start: item.start
+                    }))
 
             });
             calendar.render();
+
+            calendarEl.addEventListener('mouseover', function(e) {
+                if (e.target.classList.contains('fc-event-title')) {
+                    e.target.style.cursor = 'pointer';
+                }
+            });
         });
 
     </script>
-    <style>
-        .calendar {
-            width: 70%;
-            height: 70%;
-            margin: 20px auto;
-        }
-    </style>
-</head>
-<body>
-    <div id='calendar' class="calendar"></div>
 </body>
 </html>
