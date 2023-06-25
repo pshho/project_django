@@ -39,7 +39,7 @@
     <script type="text/javascript"
         src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=oq5hyhgd7v&submodules=geocoder"></script>
 
-    <script async type="text/javascript">
+    <script type="text/javascript">
         var markers = [];
         var map;
 
@@ -51,6 +51,7 @@
                 success: function(data) {
                     if (data.length > 0) {
                         for (var i=0; i<data.length; i++) {
+
                             var lat = parseFloat(data[i].lat);
                             var lng = parseFloat(data[i].lng);
 
@@ -146,7 +147,7 @@
         </div>
     </form>
 
-    <script defer type="text/javascript">
+    <script type="text/javascript">
         // 지도 객체
         var map = new naver.maps.Map('map', {
             center: new naver.maps.LatLng(37.5666805, 126.9784147),
@@ -158,17 +159,16 @@
 
         // 마커 표시하고 숨기는 함수
         function updateMarkers(map, markers) {
-            var seoulBounds = new naver.maps.LatLngBounds(
-                new naver.maps.LatLng(37.4132947, 126.7340861), // 서울 지역 좌측 상단 좌표
-                new naver.maps.LatLng(37.7151331, 127.2693116)  // 서울 지역 우측 하단 좌표
-            );
+
+            var mapBounds = map.getBounds();
             var marker, position;
 
             for (var i = 0; i < markers.length; i++) {
-                marker = markers[i];
+
+                marker = markers[i]
                 position = marker.getPosition();
 
-                if (seoulBounds.hasLatLng(position)) {
+                if (mapBounds.hasLatLng(position)) {
                     showMarker(map, marker);
                 } else {
                     hideMarker(map, marker);
@@ -189,9 +189,15 @@
         }
 
         // updateMarkers 스크롤 시 함수 실행
-        naver.maps.Event.addListener(map, 'idle', function() {
+        naver.maps.Event.addListener(map, 'zoom_changed', function() {
+            updateMarkers(map, markers);
+
+        });
+
+        naver.maps.Event.addListener(map, 'dragend', function() {
             updateMarkers(map, markers);
         });
+
 
         // 지도 현재 위치 찾기 버튼
         var locationBtnHtml = '<a href="#"><div class="btn_Img"></div></a>';

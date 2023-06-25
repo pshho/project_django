@@ -16,8 +16,8 @@
             font-size: 2rem;
         }
     </style>
-    <script async src="{% static 'poll/js/fullcalendar-6.1.8/fullcalendar-6.1.8/dist/index.global.js' %}"></script>
-    <script async src="https://code.jquery.com/jquery-3.7.0.js"
+    <script src="{% static 'poll/js/fullcalendar-6.1.8/fullcalendar-6.1.8/dist/index.global.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"
             integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
             crossorigin="anonymous"></script>
 </head>
@@ -27,7 +27,7 @@
         <div id='calendar' class="calendar"></div>
     </section>
 
-    <script async>
+    <script type="text/javascript">
 
         document.addEventListener('DOMContentLoaded', function() {
                 var calendarEl = document.getElementById('calendar');
