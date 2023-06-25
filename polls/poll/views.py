@@ -1,7 +1,9 @@
 import csv
 import json
+import os
 import urllib
 import requests
+import logging
 
 from datetime import datetime, timedelta
 from django.http import HttpResponse, JsonResponse
@@ -50,8 +52,12 @@ def vote(request, question_id):
 
     return render(request, 'poll/result.html', {'question': question})
 
-# 지도 검색 함수
+# 지도 표시 html 보냄
 def search(request):
+    return render(request, 'poll/search.html')
+
+# 지도 검색 함수
+def search2(request):
     if request.method == 'GET':
 
         context = {}
@@ -78,97 +84,49 @@ def search(request):
 
             for item in items:
                 sub_item = {
-                    'title':item.get('title'),
+                    'title': item.get('title'),
                     'category': item.get('category'),
-                    'address':item.get('address'),
-                    'roadAddress':item.get('roadAddress')
+                    'address': item.get('address'),
+                    'roadAddress': item.get('roadAddress')
                 }
 
                 sub_items.append(sub_item)
 
             context = {
-                'items':sub_items
+                'items': sub_items,
             }
 
         else:
             print("Error Code:" + rescode)
 
         return JsonResponse(context)
+    return JsonResponse({'result': '실패'})
 
-# 지도 표시 html 보냄
-def search2(request):
-    return render(request, 'poll/search.html')
+def map_convert(request):
+    context = []
 
-# map마커 함수
-def mapmarker(request):
     if request.method == 'GET':
+        with open('C:/project_django/polls/static/poll/resources/서울시부동산전월세가,위도경도추가.csv', 'r') as r:
+            data_list = csv.reader(r)
+            next(data_list)
 
-        client_id = "Gr3DZKpSitjNw83linRK"
-        client_secret = "CM1z5bCrQ6"
-        q = request.GET.get('q')
-        encText = urllib.parse.quote('{}'.format(q))
-        sort = 'random'
-        display = 5
+            for data in data_list:
 
-        url = f"https://openapi.naver.com/v1/search/local.json?query={encText}&display={display}&sort={sort}"
-        req = urllib.request.Request(url)
-        req.add_header("X-Naver-Client-Id", client_id)
-        req.add_header("X-Naver-Client-Secret", client_secret)
-        response = urllib.request.urlopen(req)
-        rescode = response.getcode()
+                context.append({
+                    'lat': data[-1],
+                    'lng': data[-2],
+                    'bp': data[-8],
+                    'bn': data[15],
+                    'st': data[2],
+                    'st2': data[4],
+                    'ad1': data[7],
+                    'ad2': data[8],
 
-        if (rescode == 200):
-            response_body = response.read()
-            result = json.loads(response_body.decode('utf-8'))
-            items = result.get('items')
-            sub_items = []
+                })
 
-            for item in items:
-                sub_item = {
-                    'title':item.get('title'),
-                    'category': item.get('category'),
-                    'address':item.get('address'),
-                    'roadAddress':item.get('roadAddress')
-                }
+        return JsonResponse(context, safe=False)
 
-                sub_items.append(sub_item)
-
-            context = {
-                'items':sub_items
-            }
-
-        else:
-            print("Error Code:" + rescode)
-
-        return JsonResponse(context)
-
-
-
-
-    with open('./polls/static/poll/resources/서울시부동산정보.csv', 'r') as r:
-        data_list = csv.reader(r)
-        ssg_list = []
-        count = 0
-        for data in data_list:
-            if data[7] != '' or data[8] != '' or data[15] != '':
-                if data[8] != '0000':
-                    result = data[2] + ' ' + data[4] + ' ' + data[7] + ' ' + data[8]
-                    ssg_list.append(result)
-                    count += 1
-                elif data[8] == '0000':
-                    result = data[2] + ' ' + data[4] + ' ' + data[7]
-                    ssg_list.append(result)
-                    count += 1
-
-    print(ssg_list)
-    print(count)
-
-    context = {
-        'ssg_list':ssg_list
-    }
-    return JsonResponse(context)
-
-
+    return JsonResponse({'result': '실패'})
 
 # calendar에 청약 일정 추가하는 함수
 def calendar(request):
@@ -263,6 +221,8 @@ def calendar(request):
             'context':results
         }
         return render(request, 'poll/calendar.html', context)
+
+    return render(request, 'poll/calendar.html')
 
 # 달력 iframe 출력
 def calendar_iframe(request, title):
@@ -367,3 +327,5 @@ def calendar_iframe(request, title):
         }
 
         return render(request, 'poll/calendar_iframe.html', context)
+
+    return render(request, 'poll/calendar_iframe.html')

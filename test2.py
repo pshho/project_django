@@ -38,20 +38,36 @@ with open('강남구.csv', 'w', newline='') as w:
     writer.writerows(ssg_list)
 '''
 
-with open('./polls/static/poll/resources/강남구.csv', 'r') as r:
+ssg_list = []
+total_list = []
+c1 = 0
+
+
+for i in range(1, 26):
+    with open(f'C:/Users/zptmz/OneDrive/바탕 화면/전월세,실거래가정보/서울시부동산전월세가{i}(위도,경도).csv', 'r') as r:
+        data_list = csv.reader(r)
+
+        for data in data_list:
+            total_list.append(data)
+            c1 += 1
+
+'''
+with open(f'C:/Users/zptmz/OneDrive/바탕 화면/전월세,실거래가정보/서울시부동산실거래가.csv', 'r') as r:
     data_list = csv.reader(r)
-    ssg_list = []
-    count = 0
 
-    for item in data_list:
-        if len(item) >= 4:
-            result = item[0] + ' ' + item[1] + ' ' + item[2] + ' ' + item[3]
-            ssg_list.append(result)
-            count += 1
-        else:
-            result = item[0] + ' ' + item[1] + ' ' + item[2]
-            ssg_list.append(result)
-            count += 1
+    for data in data_list:
+        if '강서구' == data[2]:
+            ssg_list.append(data)
+            c1 += 1
 
-print(ssg_list)
-print(count)
+            if c1 == 50:
+                break
+'''
+
+with open('C:/Users/zptmz/OneDrive/바탕 화면/전월세,실거래가정보/서울시부동산전월세가(위도,경도).csv', 'w', newline='') as w:
+    write = csv.writer(w)
+    write.writerows(total_list)
+    print('쓰기 성공')
+
+print(c1)
+# print(ssg_list)
