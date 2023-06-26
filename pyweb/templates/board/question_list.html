@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load board_filter %}
 {% block content %}
 <div class="container my-3">
     <section id="question_list">
@@ -13,7 +14,7 @@
                 {% if question_list %}
                 {% for question in question_list %}
                 <tr>
-                    <td>{{ forloop.counter }}</td>
+                    <td>{{ question_list.paginator.count|sub:question_list.start_index|sub:forloop.counter0|add:1 }}</td>
                     <td>
                         <a href="{% url 'board:detail' question.id %}" class="text-decoration-none">
                             {{ question.subject }}
@@ -30,6 +31,46 @@
                 {% endif %}
             </tbody>
         </table>
+    <!-- 페이지 처리 영역 -->
+    <ul class="pagination justify-content-center">
+        <!-- 이전 페이지 -->
+        {% if question_list.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ question_list.previous_page_number }}">&laquo;</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+        {% endif %}
+
+        <!-- 현재 페이지 -->
+        {% for page_number in question_list.paginator.page_range %}
+            <!-- 현재 페이지와 리스트의 페이지가 일치하면 활성화함 -->
+            {% if question_list.number == page_number %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page_number }}</span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        <!-- 다음 페이지 -->
+        {% if question_list.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ question_list.next_page_number }}">&raquo;</a>
+            </li>
+        {% else %}
+            <!--이전 페이지가 없어도 적용됨-->
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+        {% endif %}
+    </ul>
+
 
         <a href="{% url 'board:question_create' %}" class="btn btn-primary">질문 등록</a>
     </section>

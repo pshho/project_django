@@ -18,70 +18,66 @@ class Choice(models.Model):
     def __str__(self):
         return self.choice_text
 
-# 서울시부동산실거래가정보
-class SeoulEstateReal(models.Model):
-    접수연도 = models.IntegerField(null=True, blank=True)
-    자치구코드 = models.IntegerField(null=True, blank=True)
-    자치구명 = models.CharField(max_length=30)
-    법정동코드 = models.IntegerField(null=True, blank=True)
-    법정동명 = models.CharField(max_length=40)
-    본번 = models.IntegerField(null=True, blank=True)
-    부번 = models.IntegerField(null=True, blank=True)
-    건물명 = models.CharField(max_length=200)
-    계약일 = models.CharField(max_length=20, null=True, blank=True)
-    물건금액_만원 = models.IntegerField(null=True, blank=True)
-    건물면적 = models.CharField(max_length=30)
-    토지면적 = models.CharField(max_length=30)
-    층 = models.CharField(max_length=10)
-    권리구분 = models.CharField(max_length=25, null=True, blank=True)
-    취소일 = models.CharField(max_length=20, null=True, blank=True)
-    건축년도 = models.CharField(max_length=20)
-    건물용도 = models.CharField(max_length=50)
-    신고구분 = models.CharField(max_length=20, null=True, blank=True)
+class Seoulestate(models.Model):
+    class Meta:
+        db_table = 'Seoulestate'
+
+    year = models.CharField(max_length=50, null=True, blank=True)
+    gucd = models.CharField(max_length=50, null=True, blank=True)
+    gunm = models.CharField(max_length=50, null=True, blank=True)
+    dongcd = models.CharField(max_length=50, null=True, blank=True)
+    dongnm = models.CharField(max_length=50, null=True, blank=True)
+    distin = models.CharField(max_length=30, null=True, blank=True)
+    distinnm = models.CharField(max_length=30, null=True, blank=True)
+    bn = models.CharField(max_length=50, null=True, blank=True)
+    sbn = models.CharField(max_length=50, null=True, blank=True)
+    fl = models.CharField(max_length=50, null=True, blank=True)
+    cont = models.CharField(max_length=200, null=True, blank=True)
+    distin2 = models.CharField(max_length=50, null=True, blank=True)
+    spa = models.CharField(max_length=100, null=True, blank=True)
+    depos = models.CharField(max_length=50, null=True, blank=True)
+    depos2 = models.CharField(max_length=50, null=True, blank=True)
+    bdnm = models.TextField(null=True, blank=True)
+    bdcont = models.CharField(max_length=50, null=True, blank=True)
+    bdusa = models.CharField(max_length=50, null=True, blank=True)
+    cont2 = models.CharField(max_length=500, null=True, blank=True)
+    newcont = models.CharField(max_length=50, null=True, blank=True)
+    newcont2 = models.CharField(max_length=20, null=True, blank=True)
+    olddepos = models.CharField(max_length=50, blank=True, null=True)
+    olddepos2 = models.CharField(max_length=50, blank=True, null=True)
+    lat = models.CharField(max_length=300, null=True, blank=True)
+    lng = models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
-        return self.건물명
+        return self.bn
 
-# 서울시부동산실거래가(위도,경도)
-class SeoulEstateRentLonLat(models.Model):
-    주소 = models.CharField(max_length=400)
-    위도 = models.CharField(max_length=300)
-    경도 = models.CharField(max_length=300)
+class Seoulestate2(models.Model):
+    class Meta:
+        db_table = 'Seoulestate2'
 
-    def __str__(self):
-        return self.주소
-
-# 서울시부동산전월세가정보
-class SeoulEstateRent(models.Model):
-    접수연도 = models.IntegerField(null=True, blank=True)
-    자치구코드 = models.IntegerField(null=True, blank=True)
-    자치구명 = models.CharField(max_length=30)
-    법정동코드 = models.IntegerField(null=True, blank=True)
-    법정동명 = models.CharField(max_length=40)
-    본번 = models.IntegerField(null=True, blank=True)
-    부번 = models.IntegerField(null=True, blank=True)
-    층 = models.CharField(max_length=10)
-    계약일 = models.CharField(max_length=20, null=True, blank=True)
-    전월세구분 = models.CharField(max_length=30, null=True, blank=True)
-    임대면적 = models.CharField(max_length=30)
-    보증금_만원 = models.IntegerField(null=True, blank=True)
-    임대료_만원 = models.IntegerField(null=True, blank=True)
-    건물명 = models.CharField(max_length=200)
-    건축년도 = models.CharField(max_length=20)
-    건물용도 = models.CharField(max_length=50)
-    계약기간 = models.CharField(max_length=100, null=True, blank=True)
-    신규갱신여부 = models.CharField(max_length=20, null=True, blank=True)
-    종전보증금_만원 = models.IntegerField(null=True, blank=True)
-    종전임대료_만원 = models.IntegerField(null=True, blank=True)
+    year = models.CharField(max_length=50, null=True, blank=True)
+    gucd = models.CharField(max_length=50, null=True, blank=True)
+    gunm = models.CharField(max_length=50, null=True, blank=True)
+    dongcd = models.CharField(max_length=50, null=True, blank=True)
+    dongnm = models.CharField(max_length=50, null=True, blank=True)
+    distin = models.CharField(max_length=30, null=True, blank=True)
+    distinnm = models.CharField(max_length=30, null=True, blank=True)
+    bn = models.CharField(max_length=50, null=True, blank=True)
+    sbn = models.CharField(max_length=50, null=True, blank=True)
+    bdnm = models.TextField(null=True, blank=True)
+    cont = models.CharField(max_length=200, null=True, blank=True)
+    depos = models.CharField(max_length=50, null=True, blank=True)
+    spa = models.CharField(max_length=100, null=True, blank=True)
+    spa2 = models.CharField(max_length=100, null=True, blank=True)
+    fl = models.CharField(max_length=50, null=True, blank=True)
+    authr = models.CharField(max_length=50, null=True, blank=True)
+    cancel = models.CharField(max_length=50, null=True, blank=True)
+    bdcont = models.CharField(max_length=50, null=True, blank=True)
+    bdusa = models.CharField(max_length=50, null=True, blank=True)
+    noti = models.CharField(max_length=50, null=True, blank=True)
+    notibu = models.CharField(max_length=200, null=True, blank=True)
+    lat = models.CharField(max_length=300, null=True, blank=True)
+    lng = models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
-        return self.건물명
-
-# 서울시부동산전월세가(위도,경도)
-class SeoulEstateRealLonLat(models.Model):
-    주소 = models.CharField(max_length=400)
-    위도 = models.CharField(max_length=300)
-    경도 = models.CharField(max_length=300)
-
-    def __str__(self):
-        return self.주소
+        return self.bn

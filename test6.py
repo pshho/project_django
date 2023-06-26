@@ -28,7 +28,7 @@ for item1 in s1:
                 s3.append(item1 + [str(item2[1])] + [str(item2[2])])
                 c3 += 1
 
-with open('C:/Users/zptmz/OneDrive/바탕 화면/전월세,실거래가정보/서울시부동산전월세가,위도경도추가.csv', 'w', newline='') as w:
+with open('C:/Users/zptmz/OneDrive/바탕 화면/전월세,실거래가정보/seoul2.csv', 'w', newline='') as w:
     write = csv.writer(w)
     write.writerows(s3)
 

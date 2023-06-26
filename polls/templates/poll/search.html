@@ -16,7 +16,7 @@
         .btn_Img {
             width: 50px;
             height: 40px;
-            background-image: url({% static 'poll/images/loc.png' %});
+            background-image: url({% static 'poll/images/icon1.png' %});
             background-size: cover;
         }
 
@@ -33,18 +33,63 @@
         }
 
     </style>
-    <script src="https://code.jquery.com/jquery-3.7.0.js"
+    <script type="text/javascript"
+            src="https://code.jquery.com/jquery-3.7.0.js"
             integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
             crossorigin="anonymous"></script>
     <script type="text/javascript"
         src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=oq5hyhgd7v&submodules=geocoder"></script>
+    <script type="text/javascript" src="{% static 'poll/js/MarkerClustering.js' %}"></script>
+</head>
+<body>
+    <div id="map"></div>
+    <form action="{% url 'poll:search' %}" method="get">
+        {% csrf_token %}
+        <div id="btn">
+            <input type="text" id="address">
+            <datalist></datalist>
+            <input type="submit" value="찾기">
+        </div>
+    </form>
 
-    <script type="text/javascript">
+        <script type="text/javascript">
         var markers = [];
         var map;
 
-        $(document).ready(function() {
-           $.ajax({
+        $(window).on('load', function() {
+            // 마커 표시하고 숨기는 함수
+            function updateMarkers(map, markers) {
+
+                var mapBounds = map.getBounds();
+                var marker, position;
+
+                for (var i = 0; i < markers.length; i++) {
+
+                    marker = markers[i]
+                    position = marker.getPosition();
+
+                    if (mapBounds.hasLatLng(position)) {
+                        showMarker(map, marker);
+                    } else {
+                        hideMarker(map, marker);
+                    }
+                }
+            }
+
+            // 화면에서 보이는 영역 마커 표시 함수
+            function showMarker(map, marker) {
+                if (marker.getMap()) return;
+                marker.setMap(map);
+            }
+
+            // 화면에서 안보일 때 마커 숨기는 함수
+            function hideMarker(map, marker) {
+                if (!marker.getMap()) return;
+                marker.setMap(null);
+            }
+
+
+            $.ajax({
                 type: 'get',
                 url: '{% url 'poll:map_convert' %}',
                 dataType: 'json',
@@ -57,18 +102,18 @@
 
                             var iconUrl = '';
 
-                            if (data[i].bp === '연립다세대') {
+                            if (data[i].bdusa === '연립다세대') {
                                 iconUrl = "{% static 'poll/images/icon2.png' %}";
-                            } else if (data[i].bp === '아파트') {
+                            } else if (data[i].bdusa === '아파트') {
                                 iconUrl = "{% static 'poll/images/loc.png' %}";
-                            } else if (data[i].bp === '오피스텔') {
+                            } else if (data[i].bdusa === '오피스텔') {
                                 iconUrl = "{% static 'poll/images/icon3.png' %}";
-                            }else if (data[i].bp === '단독다가구') {
+                            }else if (data[i].bdusa === '단독다가구') {
                                 iconUrl = "{% static 'poll/images/icon1.png' %}";
                             }
 
                             var marker = new naver.maps.Marker({
-                                position: new naver.maps.LatLng(lat, lng),
+                                position: new naver.maps.LatLng(lng, lat),
                                 zIndex: 100,
                                 map: map,
                                 icon: {
@@ -79,7 +124,9 @@
                                 }
                             });
 
-                            var text = data[i].bn + '<br><br>' + data[i].st + ' ' + data[i].st2 + ' ' + data[i].ad1 + ' ' + data[i].ad2;
+                            markers.push(marker);
+
+                            var text = data[i].bdnm;
 
                             (function(marker, content) {
                                 naver.maps.Event.addListener(marker, 'click', function() {
@@ -96,9 +143,38 @@
                                 });
                             })(marker, text);
 
-                            markers.push(marker);
-
                         };
+
+                        var markerClustering = new MarkerClustering({
+                            minClusterSize: 2,
+                            maxZoom: 5,
+                            map: map,
+                            markers: markers,
+                            disableClickZoom: false,
+                            gridSize: 120,
+                            icons: [
+                                { content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url({% static 'poll/images/cluster-marker-1.png' %});background-size:contain;"></div>', size: N.Size(40, 40), anchor: N.Point(20, 20) },
+                                { content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url({% static 'poll/images/cluster-marker-2.png' %});background-size:contain;"></div>', size: N.Size(40, 40), anchor: N.Point(20, 20) },
+                                { content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url({% static 'poll/images/cluster-marker-3.png' %});background-size:contain;"></div>', size: N.Size(40, 40), anchor: N.Point(20, 20) },
+                                { content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url({% static 'poll/images/cluster-marker-4.png' %});background-size:contain;"></div>', size: N.Size(40, 40), anchor: N.Point(20, 20) },
+                                { content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url({% static 'poll/images/cluster-marker-5.png' %});background-size:contain;"></div>', size: N.Size(40, 40), anchor: N.Point(20, 20) }
+                            ],
+                            indexGenerator: [10, 50, 100, 250, 500],
+                            stylingFunction: function(clusterMarker, count) {
+                                $(clusterMarker.getElement()).find('div:first-child').text(count);
+                            }
+                        });
+
+                        // updateMarkers 스크롤 시 함수 실행
+                        naver.maps.Event.addListener(map, 'zoom_changed', function() {
+                            updateMarkers(map, markers);
+
+                        });
+
+                        naver.maps.Event.addListener(map, 'dragend', function() {
+                            updateMarkers(map, markers);
+                        });
+
                     } else {
                         console.log('실패');
                     };
@@ -133,152 +209,99 @@
                 })
 
             })
+
+            // 지도 객체
+            var map = new naver.maps.Map('map', {
+                center: new naver.maps.LatLng(37.5666805, 126.9784147),
+                zoom: 18,
+                mapTypeControl: true,
+                mapTypeId: naver.maps.MapTypeId.NORMAL,
+                enableHighAccuracy: true,
+                style: naver.maps.ZoomControlStyle.SMALL,
+            });
+
+            // 주소로 지도 검색
+            function searchAddressToCoordinate(address, title) {
+                naver.maps.Service.geocode({
+                    query: address
+                }, function (status, response) {
+                    if (status === naver.maps.Service.Status.ERROR) {
+                        return alert('접속 실패!');
+                    }
+
+                    if (response.v2.meta.totalCount === 0) {
+                        return alert('찾지 못했습니다.');
+                    }
+
+                    var htmlAddresses = [],
+                        item = response.v2.addresses[0],
+                        point = new naver.maps.Point(item.x, item.y);
+
+                    map.setCenter(point);
+                });
+            }
+
+            // 지도 실행시 처음 위치
+            function initGeocoder() {
+                searchAddressToCoordinate('서울 강남구 테헤란로5길 24 장연빌딩', '강남 그린컴퓨터아카데미');
+            }
+
+            // 지도 실행시 지정한 처음 위치 불러옴
+            initGeocoder();
+
+            // 지도 현재 위치 찾기 버튼
+            var locationBtnHtml = '<a href="#"><div class="btn_Img"></div></a>';
+
+            // 지도에 표시 객체2
+            var infowindow2 = new naver.maps.InfoWindow();
+
+            // 지도 마우스 커서 포인트
+            map.setCursor('pointer');
+
+            // 지도의 현재 위치 찾는 코드
+            naver.maps.Event.once(map, 'init', function () {
+                var customControl = new naver.maps.CustomControl(locationBtnHtml, {
+                    position: naver.maps.Position.RIGHT_CENTER
+                });
+
+                customControl.setMap(map);
+
+                naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
+
+                    function onSuccessGeolocation(position) {
+                        var location = new naver.maps.LatLng(position.coords.latitude,
+                            position.coords.longitude);
+
+                        map.setCenter(location); // 얻은 좌표를 지도의 중심으로 설정합니다.
+                        map.setZoom(10); // 지도의 줌 레벨을 변경합니다.
+
+                        infowindow2.setContent('<div style="padding:20px;">' + location + '</div>');
+
+                        infowindow2.open(map, location);
+                    }
+
+                    function onErrorGeolocation() {
+                        var center = map.getCenter();
+
+                        infowindow2.setContent('<div style="padding:20px;">' +
+                            '<h5 style="margin-bottom:5px;color:#f00;">Geolocation failed!</h5>' + "latitude: " + center.lat() + "<br />longitude: " + center.lng() + '</div>');
+
+                        infowindow2.open(map, center);
+                    }
+
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(onSuccessGeolocation, onErrorGeolocation);
+                    } else {
+                        var center = map.getCenter();
+                        infowindow2.setContent('<div style="padding:20px;"><h5 style="margin-bottom:5px;color:#f00;">Geolocation not supported</h5></div>');
+                        infowindow2.open(map, center);
+                    }
+
+                });
+            });
+
         })
     </script>
-</head>
-<body>
-    <div id="map"></div>
-    <form action="{% url 'poll:search' %}" method="get">
-        {% csrf_token %}
-        <div id="btn">
-            <input type="text" id="address">
-            <datalist></datalist>
-            <input type="submit" value="찾기">
-        </div>
-    </form>
 
-    <script type="text/javascript">
-        // 지도 객체
-        var map = new naver.maps.Map('map', {
-            center: new naver.maps.LatLng(37.5666805, 126.9784147),
-            zoom: 18,
-            mapTypeControl: true,
-            mapTypeId: naver.maps.MapTypeId.NORMAL,
-            enableHighAccuracy: true
-        });
-
-        // 마커 표시하고 숨기는 함수
-        function updateMarkers(map, markers) {
-
-            var mapBounds = map.getBounds();
-            var marker, position;
-
-            for (var i = 0; i < markers.length; i++) {
-
-                marker = markers[i]
-                position = marker.getPosition();
-
-                if (mapBounds.hasLatLng(position)) {
-                    showMarker(map, marker);
-                } else {
-                    hideMarker(map, marker);
-                }
-            }
-        }
-
-        // 화면에서 보이는 영역 마커 표시 함수
-        function showMarker(map, marker) {
-            if (marker.getMap()) return;
-            marker.setMap(map);
-        }
-
-        // 화면에서 안보일 때 마커 숨기는 함수
-        function hideMarker(map, marker) {
-            if (!marker.getMap()) return;
-            marker.setMap(null);
-        }
-
-        // updateMarkers 스크롤 시 함수 실행
-        naver.maps.Event.addListener(map, 'zoom_changed', function() {
-            updateMarkers(map, markers);
-
-        });
-
-        naver.maps.Event.addListener(map, 'dragend', function() {
-            updateMarkers(map, markers);
-        });
-
-
-        // 지도 현재 위치 찾기 버튼
-        var locationBtnHtml = '<a href="#"><div class="btn_Img"></div></a>';
-
-        // 지도에 표시 객체2
-        var infowindow2 = new naver.maps.InfoWindow();
-
-        // 지도 마우스 커서 포인트
-        map.setCursor('pointer');
-
-        // 주소로 지도 검색
-        function searchAddressToCoordinate(address, title) {
-            naver.maps.Service.geocode({
-                query: address
-            }, function (status, response) {
-                if (status === naver.maps.Service.Status.ERROR) {
-                    return alert('접속 실패!');
-                }
-
-                if (response.v2.meta.totalCount === 0) {
-                    return alert('찾지 못했습니다.');
-                }
-
-                var htmlAddresses = [],
-                    item = response.v2.addresses[0],
-                    point = new naver.maps.Point(item.x, item.y);
-
-                map.setCenter(point);
-            });
-        }
-
-        // 지도 실행시 처음 위치
-        function initGeocoder() {
-            searchAddressToCoordinate('서울 강남구 테헤란로5길 24 장연빌딩', '강남 그린컴퓨터아카데미');
-        }
-
-        // 지도 실행시 지정한 처음 위치 불러옴
-        initGeocoder();
-
-        // 지도의 현재 위치 찾는 코드
-        naver.maps.Event.once(map, 'init', function () {
-            var customControl = new naver.maps.CustomControl(locationBtnHtml, {
-                position: naver.maps.Position.RIGHT_CENTER
-            });
-
-            customControl.setMap(map);
-
-            naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
-
-                function onSuccessGeolocation(position) {
-                    var location = new naver.maps.LatLng(position.coords.latitude,
-                        position.coords.longitude);
-
-                    map.setCenter(location); // 얻은 좌표를 지도의 중심으로 설정합니다.
-                    map.setZoom(10); // 지도의 줌 레벨을 변경합니다.
-
-                    infowindow2.setContent('<div style="padding:20px;">' + location + '</div>');
-
-                    infowindow2.open(map, location);
-                }
-
-                function onErrorGeolocation() {
-                    var center = map.getCenter();
-
-                    infowindow2.setContent('<div style="padding:20px;">' +
-                        '<h5 style="margin-bottom:5px;color:#f00;">Geolocation failed!</h5>' + "latitude: " + center.lat() + "<br />longitude: " + center.lng() + '</div>');
-
-                    infowindow2.open(map, center);
-                }
-
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(onSuccessGeolocation, onErrorGeolocation);
-                } else {
-                    var center = map.getCenter();
-                    infowindow2.setContent('<div style="padding:20px;"><h5 style="margin-bottom:5px;color:#f00;">Geolocation not supported</h5></div>');
-                    infowindow2.open(map, center);
-                }
-
-            });
-        });
-
-    </script>
 </body>
 </html>

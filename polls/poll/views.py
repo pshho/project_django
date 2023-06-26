@@ -6,10 +6,13 @@ import requests
 import logging
 
 from datetime import datetime, timedelta
+
+from django.forms import model_to_dict
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
+from django.core import serializers
 
-from poll.models import Question
+from .models import Question, Seoulestate, Seoulestate2
 
 def index(request):
     return render(request, 'poll/index.html')
@@ -103,28 +106,12 @@ def search2(request):
     return JsonResponse({'result': '실패'})
 
 def map_convert(request):
-    context = []
 
     if request.method == 'GET':
-        with open('C:/project_django/polls/static/poll/resources/서울시부동산전월세가,위도경도추가.csv', 'r') as r:
-            data_list = csv.reader(r)
-            next(data_list)
+        seoul_list = Seoulestate.objects.all()
+        data = [model_to_dict(seoul) for seoul in seoul_list]
 
-            for data in data_list:
-
-                context.append({
-                    'lat': data[-1],
-                    'lng': data[-2],
-                    'bp': data[-8],
-                    'bn': data[15],
-                    'st': data[2],
-                    'st2': data[4],
-                    'ad1': data[7],
-                    'ad2': data[8],
-
-                })
-
-        return JsonResponse(context, safe=False)
+        return JsonResponse(data, safe=False)
 
     return JsonResponse({'result': '실패'})
 
