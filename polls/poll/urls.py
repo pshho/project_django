@@ -1,5 +1,7 @@
 from django.core.files import temp
 from django.urls import path
+from django.views.generic import TemplateView
+
 from . import views
 
 # name space(이름 공간)
@@ -19,4 +21,5 @@ urlpatterns = [
     path('calendar/', views.calendar, name='calendar'),
     path('calendar/calendar_iframe/<str:title>/', views.calendar_iframe, name='calendar_iframe'),
     path('map_convert/', views.map_convert, name='map_convert'),
+    path('search_map.js', TemplateView.as_view(template_name='search_map.js', content_type='application/javascript'), name='search_map'),
 ]
