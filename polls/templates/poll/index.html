@@ -1,27 +1,508 @@
 <!DOCTYPE html>
-<html lang="en">
 {% load static %}
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>main 페이지</title>
-    <link rel="stylesheet" href="{% static 'poll/css/style.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index</title>
+    <style>
+        *{margin: 0; padding: 0;}
+
+        /* index 시작 */
+        .main_index {
+            width: 100%;
+            height: 1200px;
+        }
+
+        ul > li {
+            list-style: none;
+        }
+
+        /* 상단 배경, 로고, 로그인/회원가입 시작 */
+        .main_index > .main_top_index {
+            width: 100%;
+            height: 400px;
+            background: url(/메인배경/메인_배경_집집.jpg) no-repeat center;
+            background-size: auto;
+            position: relative;
+        }
+
+        .main_index > .main_top_index > a {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .main_index > .main_top_index > .main_logo {
+            width: 8%;
+            height: 8vh;
+            background: url(/로고수정/중간.png) no-repeat;
+            background-size: contain;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .main_index > .main_top_index > .main_login_register {
+            font-size: 1.2rem;
+            background-color: rgb(117, 168, 169);
+            width: 13%;
+            position: absolute;
+            top: 3%;
+            right: 2%;
+            text-align: center;
+            padding: 5px 0;
+            border-radius: 5px;
+        }
+
+        .main_index > .main_top_index > .main_login_register > ul > li > a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .main_index > .main_top_index > .main_login_register > ul > li {
+            display: inline-block;
+        }
+
+        .main_index > .main_top_index > .main_login_register > ul > li:hover > a {
+            text-decoration: underline;
+        }
+
+        .main_index > .main_top_index > .main_login_register > ul > li:first-of-type {
+            border-right: 1px solid white;
+            padding-right: 8px;
+        }
+        /* 상단 배경, 로고, 로그인/회원가입 끝 */
+
+        /* 중간 검색, 배경 시작 */
+        .main_index > .main_top_index > .main_middle_index {
+            position: absolute;
+            bottom: -120px;
+            width: 100%;
+            height: 120px;
+            background-color: rgb(0, 65, 66);
+        }
+
+        .main_index > .main_top_index > .main_middle_index > div {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .main_index > .main_top_index > .main_middle_index > div > p {
+            margin: 8px 0;
+            font-size: 1.5rem;
+            color: white;
+            margin-left: 4px;
+        }
+
+        .main_index > .main_top_index > .main_middle_index > div > ul > li > input {
+            width: 100%;
+            height: 55px;
+            font-size: 1.5rem;
+        }
+
+        .main_index > .main_top_index > .main_middle_index > div > ul {
+            position: relative;
+        }
+
+        .main_index > .main_top_index > .main_middle_index > div > ul > .main_middle_search {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: 10%;
+            height: 51px;
+            transform: translateY(-50%);
+        }
+
+        .main_index > .main_top_index > .main_middle_index > div > ul > .main_middle_search > button {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(0, 65, 66);
+            background-image: url(/메뉴바아이콘흰색버전/검색.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        /* 중간 검색, 배경 끝 */
+
+        /* 하단 4개 탭 시작 */
+        .main_index > .main_top_index > .main_bottom_index {
+            width: 100%;
+            height: 550px;
+            position: absolute;
+            bottom: -710px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-evenly;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div {
+            width: 21%;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > div {
+            width: 100%;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > .main_subscription {
+            margin-left: 50px;
+            background-color: rgb(121, 203, 196);
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > .main_notice {
+            background-color: rgb(59, 189, 228);
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > .main_community {
+            background-color: rgb(255, 162, 82);
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > .main_customer_service {
+            margin-right: 50px;
+            background-color: rgb(237, 95, 107);
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > div:first-of-type {
+            position: absolute;
+            top: 0;
+            height: 50%;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > div:first-of-type > p {
+            margin-left: 30px;
+            color: white;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > div:first-of-type > p:first-of-type {
+            margin-top: 45%;
+            padding-bottom: 20px;
+            font-size: 2.2rem;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > div:first-of-type > p:last-of-type {
+            padding-left: 7px;
+            font-size: 1.2rem;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > div:last-child {
+            position: absolute;
+            right: 25px;
+            bottom: 25px;
+            height: 25%;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div:hover > div:nth-of-type(2) {
+            opacity: 1;
+            transition: opacity .8s ease-in-out;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div:hover > div:last-of-type {
+            opacity: 0;
+            transition: .3s ease-in;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_menu,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_menu,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_menu,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_menu {
+            position: absolute;
+            bottom: 1.25%;
+            left: 2.5%;
+            right: 2.5%;
+            height: 90%;
+            width: 95%;
+            background-color: white;
+            opacity: 0;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_menu > p {
+            background-color: rgb(121, 203, 196);
+            font-size: 2.6rem;
+            text-align: center;
+            color: white;
+            padding-bottom: 5px;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_menu > p {
+            background-color: rgb(59, 189, 228);
+            font-size: 2.6rem;
+            text-align: center;
+            color: white;
+            padding-bottom: 5px;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_menu > p {
+            background-color: rgb(255, 162, 82);
+            font-size: 2.6rem;
+            text-align: center;
+            color: white;
+            padding-bottom: 5px;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_menu > p {
+            background-color: rgb(237, 95, 107);
+            font-size: 2.6rem;
+            text-align: center;
+            color: white;
+            padding-bottom: 5px;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_menu > .main_subscription_subMenu,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_menu > .main_notice_subMenu,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_menu > .main_community_subMenu,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_menu > .main_customer_service_subMenu {
+            display: flex;
+            width: 100%;
+            height: 0;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_menu > .main_subscription_subMenu > div:first-of-type {
+            width: 100%;
+            height: 0;
+            border-right: 5vw solid transparent;
+            border-bottom: 5vw solid transparent;
+            border-top: 5vw solid rgb(121, 203, 196);
+            border-left: 5vw solid rgb(121, 203, 196);
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_menu > .main_notice_subMenu > div:first-of-type {
+            width: 100%;
+            height: 0;
+            border-right: 5vw solid transparent;
+            border-bottom: 5vw solid transparent;
+            border-top: 5vw solid rgb(59, 189, 228);
+            border-left: 5vw solid rgb(59, 189, 228);
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_menu > .main_community_subMenu > div:first-of-type {
+            width: 100%;
+            height: 0;
+            border-right: 5vw solid transparent;
+            border-bottom: 5vw solid transparent;
+            border-top: 5vw solid rgb(255, 162, 82);
+            border-left: 5vw solid rgb(255, 162, 82);
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_menu > .main_customer_service_subMenu > div:first-of-type {
+            width: 100%;
+            height: 0;
+            border-right: 5vw solid transparent;
+            border-bottom: 5vw solid transparent;
+            border-top: 5vw solid rgb(237, 95, 107);
+            border-left: 5vw solid rgb(237, 95, 107);
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_menu > .main_subscription_subMenu > div:last-of-type {
+            width: 100%;
+            height: 0;
+            border-right: 5.1vw solid rgb(121, 203, 196);
+            border-bottom: 5vw solid transparent;
+            border-top: 5vw solid rgb(121, 203, 196);
+            border-left: 5vw solid transparent;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_menu > .main_notice_subMenu > div:last-of-type {
+            width: 100%;
+            height: 0;
+            border-right: 5.1vw solid rgb(59, 189, 228);
+            border-bottom: 5vw solid transparent;
+            border-top: 5vw solid rgb(59, 189, 228);
+            border-left: 5vw solid transparent;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_menu > .main_community_subMenu > div:last-of-type {
+            width: 100%;
+            height: 0;
+            border-right: 5.1vw solid rgb(255, 162, 82);
+            border-bottom: 5vw solid transparent;
+            border-top: 5vw solid rgb(255, 162, 82);
+            border-left: 5vw solid transparent;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_menu > .main_customer_service_subMenu > div:last-of-type {
+            width: 100%;
+            height: 0;
+            border-right: 5.1vw solid rgb(237, 95, 107);
+            border-bottom: 5vw solid transparent;
+            border-top: 5vw solid rgb(237, 95, 107);
+            border-left: 5vw solid transparent;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_menu > div:last-of-type,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_menu > div:last-of-type,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_menu > div:last-of-type,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_menu > div:last-of-type {
+            height: 55%;
+            position: absolute;
+            bottom: 1.25%;
+            left: 10%;
+            right: 10%;
+            font-size: 1.4rem;
+            z-index: 1000;
+            text-align: center;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_menu > div:last-of-type > p,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_menu > div:last-of-type > p,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_menu > div:last-of-type > p,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_menu > div:last-of-type > p {
+            margin: 15px 0;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_menu > div:last-of-type > p:hover > a,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_menu > div:last-of-type > p:hover > a,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_menu > div:last-of-type > p:hover > a,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_menu > div:last-of-type > p:hover > a {
+            text-decoration: underline;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_menu > div:last-of-type > p > a,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_menu > div:last-of-type > p > a,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_menu > div:last-of-type > p > a,
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_menu > div:last-of-type > p > a {
+            text-decoration: none;
+            color: rgb(29, 28, 28);
+        }
+        /* 하단 4개 탭 끝 */
+
+        /* 하단 4개 탭 메뉴 아이콘 시작 */
+        .main_index > .main_top_index > .main_bottom_index > div > .main_subscription_icon {
+            background: url(/메뉴바아이콘흰색버전/2.청약.png) no-repeat right;
+            background-size: contain;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_notice_icon {
+            background: url(/메뉴바아이콘흰색버전/3.알려드려요.png) no-repeat right;
+            background-size: contain;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_community_icon {
+            background: url(/메뉴바아이콘흰색버전/4.커뮤니티.png) no-repeat right;
+            background-size: contain;
+        }
+
+        .main_index > .main_top_index > .main_bottom_index > div > .main_customer_service_icon {
+            background: url(/메뉴바아이콘흰색버전/5.고객서비스.png) no-repeat right;
+            background-size: contain;
+        }
+        /* 하단 4개 탭 메뉴 아이콘 끝 */
+
+        /* index 끝 */
+    </style>
+    <script defer src="{% static 'poll/js/search_map.js' %}"></script>
 </head>
 <body>
-    <div id="container">
-        <section id="index">
-            <div class="poll">
-                <a href="{% url 'poll:poll_list' %}">
-                    <img src="{% static 'poll/images/vote2.jpg' %}" alt="투표">
-                </a>
-                <p>설문 투표 바로가기</p>
+    <section class="main_index">
+        <section class="main_top_index">
+            <div class="main_logo"></div>
+            <a href="#"></a>
+            <div class="main_login_register">
+                <ul>
+                    <li><a href="#">로그인</a></li>
+                    <li><a href="#">회원가입</a></li>
+                </ul>
             </div>
-            <div class="poll">
-                <a href="{% url 'poll:poll_list' %}">
-                    <img src="{% static 'poll/images/ocr.png' %}" alt="OCR">
-                </a>
-                <p>OCR 바로가기</p>
-            </div>
+            <section class="main_middle_index">
+                <div>
+                    <p>어떤 집정보를 찾고 계신가요?</p>
+                    <ul>
+                        <li>
+                            <input type="text">
+                            <ul style="opacity: 1; list-style: none; z-index: 9000;" id="main_middle_search_complete" class="main_middle_search_complete">
+                                <li>A</li>
+                                <li>A</li>
+                                <li>A</li>
+                                <li>A</li>
+                            </ul>
+                        </li>
+                        <li class="main_middle_search"><button type="button"></button></li>
+                    </ul>
+                </div>
+            </section>
+            <section class="main_bottom_index">
+                <div class="main_subscription">
+                    <div>
+                        <p>청약</p>
+                        <p>청약 일정과<br>점수를 확인해보세요</p>
+                    </div>
+                    <div class="main_subscription_menu">
+                        <p>청약</p>
+                        <div class="main_subscription_subMenu">
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div>
+                            <p><a href="#">청약 일정</a></p>
+                            <p><a href="#">청약 점수 조회</a></p>
+                        </div>
+                    </div>
+                    <div class="main_subscription_icon"></div>
+                </div>
+                <div class="main_notice">
+                    <div>
+                        <p>알려드려요</p>
+                        <p>여러분이 놓친<br>부동산 정보 알아가세요</p>
+                    </div>
+                    <div class="main_notice_menu">
+                        <p>알려드려요</p>
+                        <div class="main_notice_subMenu">
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div>
+                            <p><a href="#">알아두면 좋은 지식</a></p>
+                        </div>
+                    </div>
+                    <div class="main_notice_icon"></div>
+                </div>
+                <div class="main_community">
+                    <div>
+                        <p>커뮤니티</p>
+                        <p>자유롭게 생생하게<br>인테리어까지</p>
+                    </div>
+                    <div class="main_community_menu">
+                        <p>커뮤니티</p>
+                        <div class="main_community_subMenu">
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div>
+                            <p><a href="#">자유 게시판</a></p>
+                            <p><a href="#">거래후기 게시판</a></p>
+                            <p><a href="#">인테리어 게시판</a></p>
+                            <p><a href="#">뉴스 게시판</a></p>
+                        </div>
+                    </div>
+                    <div class="main_community_icon"></div>
+                </div>
+                <div class="main_customer_service">
+                    <div>
+                        <p>고객서비스</p>
+                        <p>안녕하세요<br>여러분의 집집입니다</p>
+                    </div>
+                    <div class="main_customer_service_menu">
+                        <p>고객서비스</p>
+                        <div class="main_customer_service_subMenu">
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div>
+                            <p><a href="">공지사항</a></p>
+                            <p><a href="">소개</a></p>
+                        </div>
+                    </div>
+                    <div class="main_customer_service_icon"></div>
+                </div>
+            </section>
         </section>
-    </div>
+    </section>
 </body>
 </html>

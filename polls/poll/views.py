@@ -4,6 +4,8 @@ import os
 import urllib
 import requests
 import logging
+import asyncio
+import aiohttp
 
 from datetime import datetime, timedelta
 
@@ -109,11 +111,19 @@ def map_convert(request):
 
     if request.method == 'GET':
         seoul_list = Seoulestate.objects.all()
-        data = [model_to_dict(seoul) for seoul in seoul_list]
+        seoul_list2 = Seoulestate2.objects.all()
+        jrent = [model_to_dict(seoul) for seoul in seoul_list]
+        real = [model_to_dict(seoul) for seoul in seoul_list2]
 
-        return JsonResponse(data, safe=False)
+        results = {
+            'jrent':jrent,
+            'real':real
+        }
+
+        return JsonResponse(results, safe=False)
 
     return JsonResponse({'result': '실패'})
+
 
 # calendar에 청약 일정 추가하는 함수
 def calendar(request):
@@ -139,8 +149,6 @@ def calendar(request):
         result1 = requests.get(reqUrl1)
         json_data1 = result1.json()
 
-        # count = 0
-
         data_list = []
         # APT 분양정보 청약 접수 시작일
         for data in json_data1['data']:
@@ -148,8 +156,6 @@ def calendar(request):
                 data_list.append(data)
             elif f'{now_year}-{month2}' in data['RCEPT_BGNDE']:
                 data_list.append(data)
-                # count += 1
-                # print(data)
 
         # 오피스텔/도시형/민간임대 분양정보 청약 접수 시작일
         result2 = requests.get(reqUrl2)
@@ -160,8 +166,6 @@ def calendar(request):
                 data_list.append(data)
             elif f'{now_year}-{month2}' in data['SUBSCRPT_RCEPT_BGNDE']:
                 data_list.append(data)
-                # count += 1
-                # print(data)
 
         # APT 무순위/잔여세대 일반 공급 접수 시작일
         result3 = requests.get(reqUrl3)
@@ -172,21 +176,8 @@ def calendar(request):
                 data_list.append(data)
             elif f'{now_year}-{month2}' in data['SUBSCRPT_RCEPT_BGNDE']:
                 data_list.append(data)
-                # count += 1
-                # print(data)
-
-        # print(data_list)
-        # print(count)
-        '''
-        for data in data_list:
-            if '평택현덕지역주택조합' in data['BSNS_MBY_NM']:
-                print(data)
-        '''
-
-        # context = {'data_list':data_list}
 
         results = []
-        # count = 0
 
         for data in data_list:
             if 'RCEPT_BGNDE' in data:
@@ -194,14 +185,12 @@ def calendar(request):
                     'title': data['HOUSE_NM'],
                     'start': data['RCEPT_BGNDE']
                 }
-                # count += 1
                 results.append(result)
             elif 'SUBSCRPT_RCEPT_BGNDE' in data:
                 result = {
                     'title': data['HOUSE_NM'],
                     'start': data['SUBSCRPT_RCEPT_BGNDE']
                 }
-                # count += 1
                 results.append(result)
 
         context = {
@@ -211,8 +200,14 @@ def calendar(request):
 
     return render(request, 'poll/calendar.html')
 
+# 비동기 처리 함수
+async def fetch_data(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.json()
+
 # 달력 iframe 출력
-def calendar_iframe(request, title):
+async def calendar_iframe(request, title):
     now = datetime.now()
     now_year = now.year
     next_month = now + timedelta(days=30)
@@ -238,10 +233,21 @@ def calendar_iframe(request, title):
         reqUrl4 = url4 + page + perPage + serviceKey
         reqUrl5 = url5 + page + perPage + serviceKey
         reqUrl6 = url6 + page + perPage + serviceKey
-        result1 = requests.get(reqUrl1)
-        json_data1 = result1.json()
 
-        # count = 0
+        tasks = [
+            fetch_data(reqUrl1),
+            fetch_data(reqUrl2),
+            fetch_data(reqUrl3),
+            fetch_data(reqUrl4),
+            fetch_data(reqUrl5),
+            fetch_data(reqUrl6),
+        ]
+
+        # 비동기로 모든 작업 실행
+        responses = await asyncio.gather(*tasks)
+
+        json_data1, json_data2, json_data3, json_data4, json_data5, json_data6 = responses
+
         # 주택관리번호 추출
         house_manage = 0
 
@@ -256,12 +262,6 @@ def calendar_iframe(request, title):
                 elif f'{now_year}-{month2}' in data['RCEPT_BGNDE']:
                     house_manage = data['HOUSE_MANAGE_NO']
                     data_list.append(data)
-                    # count += 1
-                    # print(data)
-
-        # 오피스텔/도시형/민간임대 분양정보 청약 접수 시작일
-        result2 = requests.get(reqUrl2)
-        json_data2 = result2.json()
 
         for data in json_data2['data']:
             if title == data['HOUSE_NM']:
@@ -271,12 +271,6 @@ def calendar_iframe(request, title):
                 elif f'{now_year}-{month2}' in data['SUBSCRPT_RCEPT_BGNDE']:
                     house_manage = data['HOUSE_MANAGE_NO']
                     data_list.append(data)
-                    # count += 1
-                    # print(data)
-
-        # APT 무순위/잔여세대 일반 공급 접수 시작일
-        result3 = requests.get(reqUrl3)
-        json_data3 = result3.json()
 
         for data in json_data3['data']:
             if title == data['HOUSE_NM']:
@@ -287,20 +281,14 @@ def calendar_iframe(request, title):
                     house_manage = data['HOUSE_MANAGE_NO']
                     data_list.append(data)
 
-        result4 = requests.get(reqUrl4)
-        json_data4 = result4.json()
         for data in json_data4['data']:
             if house_manage == data['HOUSE_MANAGE_NO']:
                 data_list2.append(data)
 
-        result5 = requests.get(reqUrl5)
-        json_data5 = result5.json()
         for data in json_data5['data']:
             if house_manage == data['HOUSE_MANAGE_NO']:
                 data_list2.append(data)
 
-        result6 = requests.get(reqUrl6)
-        json_data6 = result6.json()
         for data in json_data6['data']:
             if house_manage == data['HOUSE_MANAGE_NO']:
                 data_list2.append(data)

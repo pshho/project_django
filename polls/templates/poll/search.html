@@ -55,9 +55,9 @@
         }
 
         .map_real_estate_detail {
-            width: 24%;
-            height: 90%;
-            background-color: white;
+            width: 23.5%;
+            height: 70%;
+            background-color: rgba(255, 255, 255, 0.9);
             position: absolute;
             top: 50px;
             z-index: 9999;
@@ -107,6 +107,27 @@
             margin: 0;
         }
 
+        .map_real_estate_detail > .map_search_view {
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .map_real_estate_detail > .map_search_view > h3 {
+            padding-left: 20px;
+        }
+
+        .map_real_estate_detail > .map_search_view > ul {
+            list-style: none;
+            font-size: 1.2rem;
+            width: 80%;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .map_real_estate_detail > .map_search_view > ul > li {
+            border-bottom: 1px solid #ccc;
+            margin: 10px auto;
+        }
+
     </style>
     <script type="text/javascript"
             src="https://code.jquery.com/jquery-3.7.0.js"
@@ -133,7 +154,10 @@
                 <label for="map_group2"><input type="radio" id="map_group2" class="map_group" value="group3">오피스텔</label>
                 <label for="map_group3"><input type="radio" id="map_group3" class="map_group" value="group4">단독다가구</label>
             </div>
-            <div></div>
+            <div class="map_search_view">
+                <h3>상세 정보</h3>
+                <ul id="map_search_print"></ul>
+            </div>
         </aside>
     </section>
 
@@ -150,8 +174,6 @@
 
         // 지도 현재 위치 찾기 버튼
         var locationBtnHtml = '<div class="myloc_btn_Img"><a href="#"></a></div>';
-
-
     </script>
 </body>
 </html>

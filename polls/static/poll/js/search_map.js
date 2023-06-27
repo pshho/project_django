@@ -82,6 +82,82 @@ function updateMarkerClustering(markers) {
     });
 }
 
+// 마커 및 마커 이벤트 생성 함수
+function createMarker(lat, lng, iconUrl, text, text_list) {
+    var marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(lng, lat),
+        map: map,
+        icon: {
+        url: iconUrl,
+        size: new naver.maps.Size(50, 50),
+        origin: new naver.maps.Point(0, 0),
+        anchor: new naver.maps.Point(25, 50)
+        }
+    });
+
+    naver.maps.Event.addListener(marker, 'click', function() {
+        // 정보창 생성
+        var infoWindow = new naver.maps.InfoWindow({
+            content: '<div style="display: inline-block; width: 200px; height: 50px; background: #f2f2f2; border: 2px solid #ddd; border-radius: 10px; color: #333; font-weight: bold; box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2); text-align: center; vertical-align: middle; line-height: 50px;">' + text + '</div>', // 정보창에 표시할 내용
+            borderWidth: 0,
+        });
+
+        // 마커에 정보창 표시
+        infoWindow.open(map, marker);
+
+        $('#map_search_print').empty();
+
+        if(text_list.length > 0) {
+            $('#map_search_print').append('<li>접수연도: ' + text_list[0] + '</li>');
+            $('#map_search_print').append('<li>주소: ' + text_list[1] + '</li>');
+            $('#map_search_print').append('<li>건물명: ' + text_list[2] + '</li>');
+
+            var dateStr = text_list[3];
+            var year = dateStr.slice(0, 4);
+            var month = dateStr.slice(4, 6);
+            var day = dateStr.slice(6, 8);
+            var formattedDate = year + '-' + month + '-' + day;
+
+            $('#map_search_print').append('<li>계약일: ' + formattedDate + '</li>');
+
+            // 추가 동작 수행
+            if (text_list[text_list.length - 1] === '2') {
+                $('#map_search_print').append('<li>전월세구분: ' + text_list[4] + '</li>');
+                var deposit = Number(text_list[5]).toLocaleString();
+                $('#map_search_print').append('<li>보증금(만원): ' + deposit + '</li>');
+                var rent = Number(text_list[6]).toLocaleString();
+                $('#map_search_print').append('<li>임대료(만원): ' + rent + '</li>');
+                $('#map_search_print').append('<li>임대면적: ' + text_list[7] + '㎡</li>');
+                $('#map_search_print').append('<li>층: ' + text_list[8] + '</li>');
+                $('#map_search_print').append('<li>건축년도: ' + text_list[9] + '</li>');
+                $('#map_search_print').append('<li>건물용도: ' + text_list[10] + '</li>');
+                $('#map_search_print').append('<li>신규갱신여부: ' + text_list[11] + '</li>');
+                $('#map_search_print').append('<li>계약갱신권사용여부: ' + text_list[12] + '</li>');
+                $('#map_search_print').append('<li>종전보증금: ' + text_list[13] + '</li>');
+                $('#map_search_print').append('<li>종전임대료: ' + text_list[14] + '</li>');
+            } else {
+                $('#map_search_print').append('<li>권리구분: ' + text_list[4] + '</li>');
+                var sale = Number(text_list[5]).toLocaleString();
+                $('#map_search_print').append('<li>물건금액(만원): ' + sale + '</li>');
+                $('#map_search_print').append('<li>건물면적: ' + text_list[6] + '㎡</li>');
+                $('#map_search_print').append('<li>토지면적: ' + text_list[7] + '㎡</li>');
+                $('#map_search_print').append('<li>층: ' + text_list[8] + '</li>');
+                $('#map_search_print').append('<li>취소일: ' + text_list[9] + '</li>');
+                $('#map_search_print').append('<li>건축년도: ' + text_list[10] + '</li>');
+                $('#map_search_print').append('<li>건물용도: ' + text_list[11] + '</li>');
+                $('#map_search_print').append('<li>신고구분: ' + text_list[12] + '</li>');
+            }
+        }
+
+        console.log(text_list.slice(-1)[0])
+
+    });
+
+    return marker;
+};
+
+var count1 = 0;
+var count2 = 0;
 $(window).on('load', function() {
     $.ajax({
         type: 'get',
@@ -89,82 +165,207 @@ $(window).on('load', function() {
         dataType: 'json',
         success: function(data) {
 
-            // 마커 및 마커 이벤트 생성 함수
-            function createMarker(lat, lng, iconUrl, text) {
-                var marker = new naver.maps.Marker({
-                    position: new naver.maps.LatLng(lng, lat),
-                    map: map,
-                    icon: {
-                    url: iconUrl,
-                    size: new naver.maps.Size(50, 50),
-                    origin: new naver.maps.Point(0, 0),
-                    anchor: new naver.maps.Point(25, 50)
-                    }
-                });
+            var lat;
+            var lng;
+            var text;
+            var iconUrl;
+            var marker;
 
-                naver.maps.Event.addListener(marker, 'click', function() {
-                    // 정보창 생성
-                    var infoWindow = new naver.maps.InfoWindow({
-                        content: text, // 정보창에 표시할 내용
-                        anchorSize: {width:5, height:5},
-                        borderWidth: 1,
-                        pixelMargin: "10px",
-                    });
+            for (var i=0; i<data.real.length; i++) {
 
-                    // 마커에 정보창 표시
-                    infoWindow.open(map, marker);
-                });
+                var text_list = [];
 
-                return marker;
-            };
-
-            for (var i=0; i<data.length; i++) {
-
-                var lat;
-                var lng;
-                var iconUrl;
-                var marker;
-                var text;
-
-                switch (data[i].bdusa) {
+                switch (data.real[i].bdusa) {
                     case '연립다세대':
                         iconUrl = "/static/poll/images/icon2.png";
-                        lat = data[i].lat;
-                        lng = data[i].lng;
-                        text = data[i].bdnm;
-                        marker = createMarker(lat, lng, iconUrl, text);
+                        lat = data.real[i].lat;
+                        lng = data.real[i].lng;
+                        text = data.real[i].bdnm;
+
+                        text_list.push(data.real[i].year);
+                        text_list.push(data.real[i].gunm + ' ' + data.real[i].dongnm + ' ' + data.real[i].bn + '-' + data.real[i].sbn);
+                        text_list.push(data.real[i].bdnm);
+                        text_list.push(data.real[i].cont);
+                        text_list.push(data.real[i].authr);
+                        text_list.push(data.real[i].depos);
+                        text_list.push(data.real[i].spa);
+                        text_list.push(data.real[i].spa2);
+                        text_list.push(data.real[i].fl);
+                        text_list.push(data.real[i].cancel);
+                        text_list.push(data.real[i].bdcont);
+                        text_list.push(data.real[i].bdusa);
+                        text_list.push(data.real[i].noti);
+                        text_list.push(data.real[i].distin);
+
+                        marker = createMarker(lat, lng, iconUrl, text, text_list);
+
                         markerGroup1.push(marker);
                         all_markers.push(marker);
+                        count1++;
                         break;
                     case '아파트':
                         iconUrl = "/static/poll/images/icon4.png";
-                        lat = data[i].lat;
-                        lng = data[i].lng;
-                        text = data[i].bdnm;
-                        marker = createMarker(lat, lng, iconUrl, text);
+                        lat = data.real[i].lat;
+                        lng = data.real[i].lng;
+                        text = data.real[i].bdnm;
+
+                        text_list.push(data.real[i].year);
+                        text_list.push(data.real[i].gunm + ' ' + data.real[i].dongnm + ' ' + data.real[i].bn + '-' + data.real[i].sbn);
+                        text_list.push(data.real[i].bdnm);
+                        text_list.push(data.real[i].cont);
+                        text_list.push(data.real[i].authr);
+                        text_list.push(data.real[i].depos);
+                        text_list.push(data.real[i].spa);
+                        text_list.push(data.real[i].spa2);
+                        text_list.push(data.real[i].fl);
+                        text_list.push(data.real[i].cancel);
+                        text_list.push(data.real[i].bdcont);
+                        text_list.push(data.real[i].bdusa);
+                        text_list.push(data.real[i].noti);
+                        text_list.push(data.real[i].distin);
+
+                        marker = createMarker(lat, lng, iconUrl, text, text_list);
+
                         markerGroup2.push(marker);
                         all_markers.push(marker);
+                        count1++;
                         break;
                     case '오피스텔':
                         iconUrl = "/static/poll/images/icon3.png";
-                        lat = data[i].lat;
-                        lng = data[i].lng;
-                        text = data[i].bdnm;
-                        marker = createMarker(lat, lng, iconUrl, text);
+                        lat = data.real[i].lat;
+                        lng = data.real[i].lng;
+                        text = data.real[i].bdnm;
+
+                        text_list.push(data.real[i].year);
+                        text_list.push(data.real[i].gunm + ' ' + data.real[i].dongnm + ' ' + data.real[i].bn + '-' + data.real[i].sbn);
+                        text_list.push(data.real[i].bdnm);
+                        text_list.push(data.real[i].cont);
+                        text_list.push(data.real[i].authr);
+                        text_list.push(data.real[i].depos);
+                        text_list.push(data.real[i].spa);
+                        text_list.push(data.real[i].spa2);
+                        text_list.push(data.real[i].fl);
+                        text_list.push(data.real[i].cancel);
+                        text_list.push(data.real[i].bdcont);
+                        text_list.push(data.real[i].bdusa);
+                        text_list.push(data.real[i].noti);
+                        text_list.push(data.real[i].distin);
+
+                        marker = createMarker(lat, lng, iconUrl, text, text_list);
+
                         markerGroup3.push(marker);
                         all_markers.push(marker);
-                        break;
-                    case '단독다가구':
-                        iconUrl = "/static/poll/images/icon1.png";
-                        lat = data[i].lat;
-                        lng = data[i].lng;
-                        marker = createMarker(lat, lng, iconUrl, text);
-                        markerGroup4.push(marker);
-                        all_markers.push(marker);
+                        count1++;
                         break;
                     default:
                         break;
                 }
+
+                if (count1 === 500) {
+                    break;
+                }
+
+            };
+
+            for (var i=0; i<data.jrent.length; i++) {
+                var text_list = [];
+
+                switch (data.jrent[i].bdusa) {
+                    case '연립다세대':
+                        iconUrl = "/static/poll/images/icon2.png";
+                        lat = data.jrent[i].lat;
+                        lng = data.jrent[i].lng;
+                        text = data.jrent[i].bdnm;
+
+                        text_list.push(data.jrent[i].year);
+                        text_list.push(data.jrent[i].gunm + ' ' + data.jrent[i].dongnm + ' ' + data.jrent[i].bn + '-' + data.jrent[i].sbn);
+                        text_list.push(data.jrent[i].bdnm);
+                        text_list.push(data.jrent[i].cont);
+                        text_list.push(data.jrent[i].distin2);
+                        text_list.push(data.jrent[i].depos);
+                        text_list.push(data.jrent[i].depos2);
+                        text_list.push(data.jrent[i].spa);
+                        text_list.push(data.jrent[i].fl);
+                        text_list.push(data.jrent[i].bdcont);
+                        text_list.push(data.jrent[i].bdusa);
+                        text_list.push(data.jrent[i].newcont);
+                        text_list.push(data.jrent[i].newcont2);
+                        text_list.push(data.jrent[i].olddepos);
+                        text_list.push(data.jrent[i].olddepos2);
+                        text_list.push(data.jrent[i].distin);
+
+                        marker = createMarker(lat, lng, iconUrl, text, text_list);
+
+                        markerGroup1.push(marker);
+                        all_markers.push(marker);
+                        count2++;
+                        break;
+                    case '아파트':
+                        iconUrl = "/static/poll/images/icon4.png";
+                        lat = data.jrent[i].lat;
+                        lng = data.jrent[i].lng;
+                        text = data.jrent[i].bdnm;
+
+                        text_list.push(data.jrent[i].year);
+                        text_list.push(data.jrent[i].gunm + ' ' + data.jrent[i].dongnm + ' ' + data.jrent[i].bn + '-' + data.jrent[i].sbn);
+                        text_list.push(data.jrent[i].bdnm);
+                        text_list.push(data.jrent[i].cont);
+                        text_list.push(data.jrent[i].distin2);
+                        text_list.push(data.jrent[i].depos);
+                        text_list.push(data.jrent[i].depos2);
+                        text_list.push(data.jrent[i].spa);
+                        text_list.push(data.jrent[i].fl);
+                        text_list.push(data.jrent[i].bdcont);
+                        text_list.push(data.jrent[i].bdusa);
+                        text_list.push(data.jrent[i].newcont);
+                        text_list.push(data.jrent[i].newcont2);
+                        text_list.push(data.jrent[i].olddepos);
+                        text_list.push(data.jrent[i].olddepos2);
+                        text_list.push(data.jrent[i].distin);
+
+                        marker = createMarker(lat, lng, iconUrl, text, text_list);
+
+                        markerGroup2.push(marker);
+                        all_markers.push(marker);
+                        count2++;
+                        break;
+                    case '오피스텔':
+                        iconUrl = "/static/poll/images/icon3.png";
+                        lat = data.jrent[i].lat;
+                        lng = data.jrent[i].lng;
+                        text = data.jrent[i].bdnm;
+
+                        text_list.push(data.jrent[i].year);
+                        text_list.push(data.jrent[i].gunm + ' ' + data.jrent[i].dongnm + ' ' + data.jrent[i].bn + '-' + data.jrent[i].sbn);
+                        text_list.push(data.jrent[i].bdnm);
+                        text_list.push(data.jrent[i].cont);
+                        text_list.push(data.jrent[i].distin2);
+                        text_list.push(data.jrent[i].depos);
+                        text_list.push(data.jrent[i].depos2);
+                        text_list.push(data.jrent[i].spa);
+                        text_list.push(data.jrent[i].fl);
+                        text_list.push(data.jrent[i].bdcont);
+                        text_list.push(data.jrent[i].bdusa);
+                        text_list.push(data.jrent[i].newcont);
+                        text_list.push(data.jrent[i].newcont2);
+                        text_list.push(data.jrent[i].olddepos);
+                        text_list.push(data.jrent[i].olddepos2);
+                        text_list.push(data.jrent[i].distin);
+
+                        marker = createMarker(lat, lng, iconUrl, text, text_list);
+
+                        markerGroup3.push(marker);
+                        all_markers.push(marker);
+                        count2++;
+                        break;
+                    default:
+                        break;
+                }
+
+                if (count2 === 500) {
+                    break;
+                }
+
             };
 
             // 마커 클러스터링 업데이트
