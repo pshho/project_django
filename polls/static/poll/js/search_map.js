@@ -55,6 +55,61 @@ function hideMarker(map, marker) {
     marker.setMap(null);
 }
 
+// 주소로 지도 검색
+function searchAddressToCoordinate(address, title) {
+    naver.maps.Service.geocode({
+        query: address
+    }, function (status, response) {
+        if (status === naver.maps.Service.Status.ERROR) {
+            return alert('접속 실패!');
+        }
+
+        if (response.v2.meta.totalCount === 0) {
+            return alert('찾지 못했습니다.');
+        }
+
+        var htmlAddresses = [],
+            item = response.v2.addresses[0],
+            point = new naver.maps.Point(item.x, item.y);
+
+        map.setCenter(point);
+    });
+}
+
+// 지도의 현재 위치 찾는 코드
+naver.maps.Event.once(map, 'init', function () {
+    var customControl = new naver.maps.CustomControl(locationBtnHtml, {
+        position: naver.maps.Position.RIGHT_CENTER
+    });
+
+    // 커서 스타일 설정
+    customControl.getElement().style.cursor = 'pointer';
+
+    customControl.setMap(map);
+
+    naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
+
+        function onSuccessGeolocation(position) {
+            var location = new naver.maps.LatLng(position.coords.latitude,
+                position.coords.longitude);
+
+            map.setCenter(location); // 얻은 좌표를 지도의 중심으로 설정합니다.
+            map.setZoom(14); // 지도의 줌 레벨을 변경합니다.
+
+        }
+
+        function onErrorGeolocation() {
+            var center = map.getCenter();
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(onSuccessGeolocation, onErrorGeolocation);
+        } else {
+            var center = map.getCenter();
+        }
+    });
+});
+
 var all_markers = [],
     markerGroup1 = [],
     markerGroup2 = [],
@@ -66,12 +121,12 @@ function updateMarkerClustering(markers) {
 
     // 새로운 MarkerClustering 인스턴스 생성
     markerClustering = new MarkerClustering({
-    minClusterSize: 2,
-    maxZoom: 18,
+    minClusterSize: 3,
+    maxZoom: 17,
     map: map,
     markers: markers,
     disableClickZoom: true,
-    gridSize: 150,
+    gridSize: 200,
     icons: [htmlMarker1, htmlMarker2, htmlMarker3, htmlMarker4, htmlMarker5],
     indexGenerator: [10, 100, 200, 500, 1000],
     stylingFunction: function(clusterMarker, count) {
@@ -106,7 +161,6 @@ function createMarker(lat, lng, iconUrl, text, text_list) {
         infoWindow.open(map, marker);
 
         $('#map_search_print').empty();
-
         if(text_list.length > 0) {
             $('#map_search_print').append('<li>접수연도: ' + text_list[0] + '</li>');
             $('#map_search_print').append('<li>주소: ' + text_list[1] + '</li>');
@@ -148,23 +202,21 @@ function createMarker(lat, lng, iconUrl, text, text_list) {
                 $('#map_search_print').append('<li>신고구분: ' + text_list[12] + '</li>');
             }
         }
-
-        console.log(text_list.slice(-1)[0])
-
     });
 
     return marker;
 };
 
-var count1 = 0;
-var count2 = 0;
-$(window).on('load', function() {
+$(document).ready(function() {
+    searchAddressToCoordinate('서울 강남구 테헤란로5길 24 장연빌딩', '강남 그린컴퓨터아카데미');
+
     $.ajax({
         type: 'get',
         url: "../map_convert/",
         dataType: 'json',
         success: function(data) {
-
+            var count1 = 0;
+            var count2 = 0;
             var lat;
             var lng;
             var text;
@@ -261,7 +313,7 @@ $(window).on('load', function() {
                         break;
                 }
 
-                if (count1 === 500) {
+                if (count1 === 300) {
                     break;
                 }
 
@@ -362,7 +414,7 @@ $(window).on('load', function() {
                         break;
                 }
 
-                if (count2 === 500) {
+                if (count2 === 700) {
                     break;
                 }
 
@@ -371,117 +423,12 @@ $(window).on('load', function() {
             // 마커 클러스터링 업데이트
             updateMarkerClustering(all_markers);
 
-            // updateMarkers 스크롤 시 함수 실행
-            naver.maps.Event.addListener(map, 'zoom_changed', function() {
-                updateMarkers(map, all_markers);
-
-            });
-
-            naver.maps.Event.addListener(map, 'dragend', function() {
-                updateMarkers(map, all_markers);
-            });
-
         },
         error: function() {
             console.log('에러')
         }
     });
 
-    $('form').on('submit', function(e) {
-        e.preventDefault();
-        var value = $('#map_address').val();
-
-        $.ajax({
-            type: "get",
-            url: "../search2/",
-            dataType: "json",
-            data: {q:value},
-            success: function(data) {
-                if(data.items.length > 0) {
-                    searchAddressToCoordinate(data.items[0].address, data.items[0].title);
-                }else {
-                    searchAddressToCoordinate(value, value);
-                }
-
-                $('#map_address').val('');
-            },
-            error: function() {
-                console.log('확인 불가');
-            }
-        })
-
-    })
-
-    // 주소로 지도 검색
-    function searchAddressToCoordinate(address, title) {
-        naver.maps.Service.geocode({
-            query: address
-        }, function (status, response) {
-            if (status === naver.maps.Service.Status.ERROR) {
-                return alert('접속 실패!');
-            }
-
-            if (response.v2.meta.totalCount === 0) {
-                return alert('찾지 못했습니다.');
-            }
-
-            var htmlAddresses = [],
-                item = response.v2.addresses[0],
-                point = new naver.maps.Point(item.x, item.y);
-
-            map.setCenter(point);
-        });
-    }
-
-    // 지도 실행시 처음 위치
-    function initGeocoder() {
-        searchAddressToCoordinate('서울 강남구 테헤란로5길 24 장연빌딩', '강남 그린컴퓨터아카데미');
-    }
-
-    // 지도 실행시 지정한 처음 위치 불러옴
-    initGeocoder();
-})
-
-// 지도 마우스 커서 포인트
-map.setCursor('pointer');
-
-// 지도의 현재 위치 찾는 코드
-naver.maps.Event.once(map, 'init', function () {
-    var customControl = new naver.maps.CustomControl(locationBtnHtml, {
-        position: naver.maps.Position.RIGHT_CENTER
-    });
-
-    // 커서 스타일 설정
-    customControl.getElement().style.cursor = 'pointer';
-
-    customControl.setMap(map);
-
-    naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
-
-        function onSuccessGeolocation(position) {
-            var location = new naver.maps.LatLng(position.coords.latitude,
-                position.coords.longitude);
-
-            map.setCenter(location); // 얻은 좌표를 지도의 중심으로 설정합니다.
-            map.setZoom(14); // 지도의 줌 레벨을 변경합니다.
-
-        }
-
-        function onErrorGeolocation() {
-            var center = map.getCenter();
-
-        }
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(onSuccessGeolocation, onErrorGeolocation);
-        } else {
-            var center = map.getCenter();
-        }
-
-    });
-});
-
-$(document).ready(function() {
     // 미리 만든 4개의 배열
     var markerGroups = {
         group1: markerGroup1,
@@ -506,6 +453,41 @@ $(document).ready(function() {
             marker.setVisible(!isMarkersVisible);
         });
 
+    });
+
+
+    $('form').on('submit', function(e) {
+        e.preventDefault();
+        var value = $('#map_address').val();
+
+        $.ajax({
+            type: "get",
+            url: "../search2/",
+            dataType: "json",
+            data: {q:value},
+            success: function(data) {
+                if(data.items.length > 0) {
+                    searchAddressToCoordinate(data.items[0].address, data.items[0].title);
+                }else {
+                    searchAddressToCoordinate(value, value);
+                }
+                $('#map_address').val('');
+            },
+            error: function() {
+                console.log('확인 불가');
+            }
+        })
+
+    })
+
+    // updateMarkers 스크롤 시 함수 실행
+    naver.maps.Event.addListener(map, 'zoom_changed', function() {
+        updateMarkers(map, all_markers);
+
+    });
+
+    naver.maps.Event.addListener(map, 'dragend', function() {
+        updateMarkers(map, all_markers);
     });
 
 })

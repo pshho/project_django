@@ -64,9 +64,7 @@ def search(request):
 # 지도 검색 함수
 def search2(request):
     if request.method == 'GET':
-
         context = {}
-
         client_id = "Gr3DZKpSitjNw83linRK"
         client_secret = "CM1z5bCrQ6"
         q = request.GET.get('q')
@@ -94,13 +92,10 @@ def search2(request):
                     'address': item.get('address'),
                     'roadAddress': item.get('roadAddress')
                 }
-
                 sub_items.append(sub_item)
-
             context = {
                 'items': sub_items,
             }
-
         else:
             print("Error Code:" + rescode)
 
@@ -108,7 +103,6 @@ def search2(request):
     return JsonResponse({'result': '실패'})
 
 def map_convert(request):
-
     if request.method == 'GET':
         seoul_list = Seoulestate.objects.all()
         seoul_list2 = Seoulestate2.objects.all()
@@ -119,20 +113,34 @@ def map_convert(request):
             'jrent':jrent,
             'real':real
         }
-
         return JsonResponse(results, safe=False)
 
     return JsonResponse({'result': '실패'})
 
+# 이전 달, 현재 연도 당월, 다음달
+now = datetime.now()
+now_year = now.year
+now_month = now.month
+next_month = now + timedelta(days=30)
+# 이전 달 계산
+if now_month == 1:
+    previous_month = 12
+    previous_year = now_year - 1
+else:
+    previous_month = now_month - 1
+    previous_year = now_year
+month = now.strftime('%m')
+month2 = next_month.strftime('%m')
+previous_month_str = str(previous_month).zfill(2)  # 한 자리 숫자일 경우 0을 추가하여 두 자리로 맞춤
+
+# 비동기 처리 함수
+async def fetch_data(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.json()
 
 # calendar에 청약 일정 추가하는 함수
-def calendar(request):
-    now = datetime.now()
-    now_year = now.year
-    next_month = now + timedelta(days=30)
-    month = now.strftime('%m')
-    month2 = next_month.strftime('%m')
-
+async def calendar(request):
     if request.method == 'GET':
 
         url1 = 'https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail?'
@@ -146,8 +154,17 @@ def calendar(request):
         reqUrl1 = url1 + page + perPage + serviceKey
         reqUrl2 = url2 + page + perPage + serviceKey
         reqUrl3 = url3 + page + perPage + serviceKey
-        result1 = requests.get(reqUrl1)
-        json_data1 = result1.json()
+
+        tasks = [
+            fetch_data(reqUrl1),
+            fetch_data(reqUrl2),
+            fetch_data(reqUrl3)
+        ]
+
+        # 비동기로 모든 작업 실행
+        responses = await asyncio.gather(*tasks)
+
+        json_data1, json_data2, json_data3 = responses
 
         data_list = []
         # APT 분양정보 청약 접수 시작일
@@ -156,25 +173,25 @@ def calendar(request):
                 data_list.append(data)
             elif f'{now_year}-{month2}' in data['RCEPT_BGNDE']:
                 data_list.append(data)
+            elif f'{previous_year}-{previous_month_str}' in data['RCEPT_BGNDE']:
+                data_list.append(data)
 
         # 오피스텔/도시형/민간임대 분양정보 청약 접수 시작일
-        result2 = requests.get(reqUrl2)
-        json_data2 = result2.json()
-
         for data in json_data2['data']:
             if f'{now_year}-{month}' in data['SUBSCRPT_RCEPT_BGNDE']:
                 data_list.append(data)
             elif f'{now_year}-{month2}' in data['SUBSCRPT_RCEPT_BGNDE']:
                 data_list.append(data)
+            elif f'{previous_year}-{previous_month_str}' in data['SUBSCRPT_RCEPT_BGNDE']:
+                data_list.append(data)
 
         # APT 무순위/잔여세대 일반 공급 접수 시작일
-        result3 = requests.get(reqUrl3)
-        json_data3 = result3.json()
-
         for data in json_data3['data']:
             if f'{now_year}-{month}' in data['SUBSCRPT_RCEPT_BGNDE']:
                 data_list.append(data)
             elif f'{now_year}-{month2}' in data['SUBSCRPT_RCEPT_BGNDE']:
+                data_list.append(data)
+            elif f'{previous_year}-{previous_month_str}' in data['SUBSCRPT_RCEPT_BGNDE']:
                 data_list.append(data)
 
         results = []
@@ -200,20 +217,8 @@ def calendar(request):
 
     return render(request, 'poll/calendar.html')
 
-# 비동기 처리 함수
-async def fetch_data(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            return await response.json()
-
 # 달력 iframe 출력
 async def calendar_iframe(request, title):
-    now = datetime.now()
-    now_year = now.year
-    next_month = now + timedelta(days=30)
-    month = now.strftime('%m')
-    month2 = next_month.strftime('%m')
-
     if request.method == 'GET':
 
         url1 = 'https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail?'
@@ -250,9 +255,9 @@ async def calendar_iframe(request, title):
 
         # 주택관리번호 추출
         house_manage = 0
-
         data_list = []
         data_list2 = []
+
         # APT 분양정보 청약 접수 시작일
         for data in json_data1['data']:
             if title == data['HOUSE_NM']:
@@ -260,6 +265,9 @@ async def calendar_iframe(request, title):
                     house_manage = data['HOUSE_MANAGE_NO']
                     data_list.append(data)
                 elif f'{now_year}-{month2}' in data['RCEPT_BGNDE']:
+                    house_manage = data['HOUSE_MANAGE_NO']
+                    data_list.append(data)
+                elif f'{previous_year}-{previous_month_str}' in data['RCEPT_BGNDE']:
                     house_manage = data['HOUSE_MANAGE_NO']
                     data_list.append(data)
 
@@ -271,6 +279,9 @@ async def calendar_iframe(request, title):
                 elif f'{now_year}-{month2}' in data['SUBSCRPT_RCEPT_BGNDE']:
                     house_manage = data['HOUSE_MANAGE_NO']
                     data_list.append(data)
+                elif f'{previous_year}-{previous_month_str}' in data['SUBSCRPT_RCEPT_BGNDE']:
+                    house_manage = data['HOUSE_MANAGE_NO']
+                    data_list.append(data)
 
         for data in json_data3['data']:
             if title == data['HOUSE_NM']:
@@ -278,6 +289,9 @@ async def calendar_iframe(request, title):
                     house_manage = data['HOUSE_MANAGE_NO']
                     data_list.append(data)
                 elif f'{now_year}-{month2}' in data['SUBSCRPT_RCEPT_BGNDE']:
+                    house_manage = data['HOUSE_MANAGE_NO']
+                    data_list.append(data)
+                elif f'{previous_year}-{previous_month_str}' in data['SUBSCRPT_RCEPT_BGNDE']:
                     house_manage = data['HOUSE_MANAGE_NO']
                     data_list.append(data)
 

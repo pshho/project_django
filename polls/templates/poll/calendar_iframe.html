@@ -113,25 +113,15 @@
                 } else if (phoneNumber.length == 8) {
                     var formatPhNumber = cleaned.replace(/(\d{4})(\d{4})/, '$1-$2');
                 }
-
                 return formatPhNumber;
-
             }
-
             var phoneNumElement = $('#ph_number');
-
             var phoneNumber = phoneNumElement.text();
-
             var formatPhNumber = formatPhoneNumber(phoneNumber);
-
             phoneNumElement.text(formatPhNumber);
-
             var phoneNum = $('#ph_num');
-
             var phone = phoneNum.text();
-
             var formatPh = formatPhoneNumber(phone);
-
             phoneNum.text(formatPh);
 
         });
