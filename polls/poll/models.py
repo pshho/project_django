@@ -18,9 +18,10 @@ class Choice(models.Model):
     def __str__(self):
         return self.choice_text
 
-class Seoulestate(models.Model):
+# 서울 전월세가
+class SeouljRent(models.Model):
     class Meta:
-        db_table = 'Seoulestate'
+        db_table = 'SeouljRent'
 
     year = models.CharField(max_length=50, null=True, blank=True)
     gucd = models.CharField(max_length=50, null=True, blank=True)
@@ -51,9 +52,10 @@ class Seoulestate(models.Model):
     def __str__(self):
         return self.bn
 
-class Seoulestate2(models.Model):
+# 서울 실거래가
+class SeoulReal(models.Model):
     class Meta:
-        db_table = 'Seoulestate2'
+        db_table = 'SeoulReal'
 
     year = models.CharField(max_length=50, null=True, blank=True)
     gucd = models.CharField(max_length=50, null=True, blank=True)

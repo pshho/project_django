@@ -136,6 +136,7 @@
     <script type="text/javascript"
         src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=oq5hyhgd7v&submodules=geocoder"></script>
     <script type="text/javascript" src="{% static 'poll/js/MarkerClustering.js' %}"></script>
+    <script async src="{% static 'poll/js/search_map.js' %}"></script>
 </head>
 <body>
     <section class="map_real_estate">
@@ -160,9 +161,7 @@
             </div>
         </aside>
     </section>
-
-    <script defer src="{% static 'poll/js/search_map.js' %}"></script>
-    <script defer type="text/javascript">
+    <script type="text/javascript">
         // 지도 객체
         var map = new naver.maps.Map('map', {
             center: new naver.maps.LatLng(37.5666805, 126.9784147),

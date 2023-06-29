@@ -3,8 +3,8 @@ import json
 
 import chardet as chardet
 
-csv_file_path = 'static/poll/resources/seoul1.csv'
-json_file_path = 'seoulestate2.json'
+csv_file_path = 'static/poll/resources/seoul2.csv'
+json_file_path = '../SeouljRent.json'
 encoding = 'cp949'
 
 data = []
@@ -25,7 +25,7 @@ with open(csv_file_path, 'r') as csv_file:
 
     # CSV 데이터 읽기
     for row in reader:
-        model = 'poll.Seoulestate2'
+        model = 'map.SeouljRent'
         fields = row
         converted_item = {'model':model, 'fields':fields}
         data.append(converted_item)

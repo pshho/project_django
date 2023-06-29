@@ -14,7 +14,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.core import serializers
 
-from .models import Question, Seoulestate, Seoulestate2
+from .models import Question, SeouljRent, SeoulReal
 
 def index(request):
     return render(request, 'poll/index.html')
@@ -104,10 +104,10 @@ def search2(request):
 
 def map_convert(request):
     if request.method == 'GET':
-        seoul_list = Seoulestate.objects.all()
-        seoul_list2 = Seoulestate2.objects.all()
-        jrent = [model_to_dict(seoul) for seoul in seoul_list]
-        real = [model_to_dict(seoul) for seoul in seoul_list2]
+        seoul_rent = SeouljRent.objects.all()
+        seoul_real = SeoulReal.objects.all()
+        jrent = [model_to_dict(seoul) for seoul in seoul_rent]
+        real = [model_to_dict(seoul) for seoul in seoul_real]
 
         results = {
             'jrent':jrent,
@@ -122,6 +122,7 @@ now = datetime.now()
 now_year = now.year
 now_month = now.month
 next_month = now + timedelta(days=30)
+
 # 이전 달 계산
 if now_month == 1:
     previous_month = 12

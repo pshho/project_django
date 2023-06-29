@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+<section id="detail">
+    <div class="container my-3">
+        <h1>장바구니 상세정보</h1>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Update</th>
+                    <th>Quantity</th>
+                    <th>Remove</th>
+                    <th>Unit Price</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart %}
+                    {% with product=item.product %}
+                <tr>
+                    <td>
+                        <img src="{{ product.image.url }}" alt="상품사진">
+                    </td>
+                    <td>{{ item.product.name }}</td>
+                    <td>
+                        <form action="{% url 'cart:product_add' product.id %}" method="post">
+                            {% csrf_token %}
+                            {{ item.quantity_form.quantity }}
+                            {{ item.quantity_form.is_update }}
+                            <input type="submit" value="Update" class="btn btn-primary">
+                        </form>
+                    </td>
+                    <td>{{ item.quantity }}</td>
+                    <td><a href="{% url 'cart:product_remove' product.id %}">삭제</a></td>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.total_price }}</td>
+                </tr>
+                    {% endwith %}
+                {% endfor %}
+                <tr>
+                    <td>Total</td>
+                    <td colspan="4"></td>
+                    <td>{{ cart.get_product_total }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>
+            <a href="{% url 'shop:product_all' %}" class="btn btn-secondary">
+                Continue Shopping
+            </a>
+        </p>
+    </div>
+</section>
+{% endblock %}
