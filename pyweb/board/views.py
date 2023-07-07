@@ -26,6 +26,7 @@ def detail(request, question_id):
     # 모델에서 데이터가 있으면 가져오고 없으면 404페이지 오류 처리
     question = get_object_or_404(Question, pk=question_id)
     context = {'question':question}
+
     return render(request, 'board/detail.html', context)
 
 @login_required(login_url='common:login')

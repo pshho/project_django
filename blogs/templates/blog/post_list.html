@@ -19,9 +19,25 @@
         <p>포스트 X</p>
     {% endif %}
     <aside>
+        <!-- 검색 및 분류 -->
+        <div class="card my-3">
+            <h5 class="card-header">Search</h5>
+            <div class="card-body">
+                <div class="input-group">
+                    <input type="text" class="kw form-control" value="{{ kw }}">
+                    <div class="col-2 input-group-append mx-1">
+                            <button type="button" id="btn_search" class="btn btn-outline-secondary px-1">찾기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <h4>분류(Category)</h4>
         <div>
             <ul>
+                <li>
+                    <a href="{% url 'blog:post_list' %}">전체보기({{ total }})</a>
+                </li>
                 {% for category in categories %}
                     {% if current_category.slug == category.slug %}
                     <li class="background: red">
@@ -36,5 +52,17 @@
             </ul>
         </div>
     </aside>
+    <form action="" method="get" id="searchForm">
+        <input type="hidden" name="kw" id="kw">
+    </form>
 </div>
+{% block script %}
+<script>
+    $('#btn_search').click(function () {
+        $('#kw').val($('.kw').val());
+        $('#searchForm').submit();
+    });
+</script>
+{% endblock %}
+
 {% endblock %}

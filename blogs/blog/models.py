@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 class Category(models.Model):
@@ -22,8 +23,10 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     pub_date = models.DateTimeField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     modify_date = models.DateTimeField(null=True, blank=True)
     photo = models.ImageField(upload_to='blog/images/%Y/%m/%d/', null=True, blank=True) # null허용, 파일 첨부하지 않을 때도 OK
+    file = models.FileField(upload_to='blog/files/%Y/%m/%d/', null=True, blank=True)
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)    # category가 삭제되도 Post field는 삭제되지 않도록
 
     def __str__(self):

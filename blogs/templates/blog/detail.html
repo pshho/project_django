@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 <section>
     <div class="container my-3">
@@ -6,7 +7,14 @@
         <h3>{{ post.title }}</h3>
         <h5 style="white-space: pre-line; line-height: 2em;">{{ post.content }}</h5>
 
-        <p>(작성일: {{ post.pub_date }})</p>
+        <p>
+            글쓴이: {{ post.author }} (작성일: {{ post.pub_date }})
+            {% if post.author == request.user %}
+            <a href="#" class="delete" data-uri="{% url 'blog:post_delete' post.id %}">
+                삭제
+            </a>
+            {% endif %}
+        </p>
         {% if post.photo %}
         <img src="{{ post.photo.url }}">
         {% endif %}
@@ -22,4 +30,19 @@
         </ul>
     </div>
 </aside>
+
+
+{% block script %}
+<script>
+    $(function () {
+        <!-- 클릭 이벤트 -->
+        $('.delete').click(function () {
+            if (confirm('포스트를 정말 삭제하시겠습니까?')) {
+                location.href = $(this).data('uri');  // 페이지 이동
+            };
+        });
+    });
+</script>
+{% endblock %}
+
 {% endblock %}
