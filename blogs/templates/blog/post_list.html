@@ -13,7 +13,7 @@
                 </a>
             </h3>
             <h5 style="white-space: pre-line; line-height: 2em;">{{ post.content }}</h5>
-            <p>(작성일: {{ post.pub_date }})</p>
+            <p>작성자: {{ post.author }} (작성일: {{ post.pub_date }})</p>
         {% endfor %}
     {% else %}
         <p>포스트 X</p>

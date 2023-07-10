@@ -31,3 +31,16 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+# 댓글 모델
+class Comment(models.Model):
+    content = models.TextField()
+    pub_date = models.DateTimeField()
+    modify_date = models.DateTimeField(null=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # 게시글과 연결
+    post = models.ForeignKey(Post, null=True, blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.content

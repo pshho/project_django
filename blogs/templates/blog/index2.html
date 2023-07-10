@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'blog/css/bootstrap.css' %}">
+        <script src="{% static 'blog/js/bootstrap.js' %}"></script>
+        <script src="https://kit.fontawesome.com/515785cd79.js" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.7.0.js"
+                integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
+                crossorigin="anonymous"></script>
+        <style>
+            p:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+        <div class="container my-3">
+            <h1>블로그에 오신 걸 환영합니다.</h1>
+            <img src="{% static 'blog/images/cat.jpg' %}" alt="고양이" class="rounded-3">
+            <!-- 최신글 보이기 -->
+            <div class="row my-3">
+                <div class="col-2"></div>
+                <div class="col-8 text-start rounded-3">
+                    <div class="card">
+                        <h5 class="card-title p-2">최근 포스트</h5>
+                        <div class="card-body">
+                            {% for post in new_post %}
+                            <p class="card-content p-2">
+                                <a href="{% url 'blog:detail' post.id %}" style="text-decoration: none; color: black;">
+                                    {{ post.title }} - {{ post.author }}, {{ post.pub_date }}
+                                </a>
+                            </p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -24,7 +24,7 @@
             <ul class="navbar-nav ml-auto">
                 {% if not user.is_authenticated %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link" href="#" data-bs-target="#loginModal" data-bs-toggle="modal">
+                    <a class="nav-link" href="{% url 'common:login' %}" data-bs-target="#loginModal" data-bs-toggle="modal">
                         로그인
                     </a>
                 </li>
@@ -62,7 +62,7 @@
                 <a href="{% provider_login_url 'google' %}" class="btn btn-outline-dark btn-block btn-sm mx-3">
                     <i class="fa-brands fa-google">Login with Google</i>
                 </a>
-                <a href="" class="btn btn-outline-dark btn-block btn-sm">
+                <a href="{% url 'common:login' %}" class="btn btn-outline-dark btn-block btn-sm">
                     <i class="fa-regular fa-user">Login with ID</i>
                 </a>
             </div>

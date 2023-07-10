@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  댓글 수정
+{% endblock %}
+{% block content %}
+<div class="container my-3">
+  <form action="{% url 'blog:comment_update' comment.id %}" method="post">
+    {% csrf_token %}
+    <div class="form-group my-3">
+      <label for="content" class="my-3"><i class="fa-regular fa-comments"> 댓글 내용</i></label>
+      <textarea name="content" rows="3" id="content" class="form-control">{{ comment.content }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">저장</button>
+  </form>
+</div>
+{% endblock %}

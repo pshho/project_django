@@ -1,13 +1,8 @@
 from django import forms
 
-from blog.models import Post
-
+from .models import Post, Comment
 
 class PostForm(forms.ModelForm):
-    choices = [
-        ()
-    ]
-
     class Meta:
         model = Post
         fields = ['title', 'content', 'photo', 'file', 'category']
@@ -23,3 +18,12 @@ class PostForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control my-2'
+
+# 댓글 폼
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        labels = {
+            'content': '내용',
+        }
