@@ -3,7 +3,7 @@ import requests
 import urllib.request
 import json
 
-'''
+
 url = 'http://openapi.seoul.go.kr:8088/4d6e42445a746d6437354e65737162/json/tbLnOpendataRentV/1/1000/'
 
 response = urllib.request.urlopen(url)
@@ -26,6 +26,7 @@ for item in data['tbLnOpendataRentV']['row']:
         count += 1
 
 print(count)
+print(sgg_names)
 
     # 혹시 강남구면
 
@@ -33,7 +34,7 @@ print(count)
 # for sgg_name in sgg_names:
 #     print(sgg_name)
 
-'''
+
 
 '''
 with open('./polls/static/poll/resources/서울시부동산정보.csv', 'r') as r:
@@ -52,6 +53,7 @@ with open('./polls/static/poll/resources/서울시부동산정보.csv', 'r') as 
                 # count += 1
 '''
 
+'''
 with open('./polls/static/poll/resources/강남구.csv', 'r') as r:
     data_list = csv.reader(r)
     ssg_list = []
@@ -66,7 +68,9 @@ with open('./polls/static/poll/resources/강남구.csv', 'r') as r:
             result = item[0] + ' ' + item[1] + ' ' + item[2]
             ssg_list.append(result)
             # count += 1
+'''
 
+'''
 url_front = "http://api.vworld.kr/req/address?"
 url_params = "service=address&request=getcoord&version=2.0&crs=epsg:4326&refine=true&simple=false&format=json&type=road"
 url_address = "&address="
@@ -90,7 +94,7 @@ for addr in ssg_list:
         count += 1
 
 print(count)
-
+'''
 
 
 
